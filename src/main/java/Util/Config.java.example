@@ -1,0 +1,9 @@
+package Util;
+
+public class Config {
+    public static final String app_name = "ABCD";
+    public static final String app_url = "http://192.168.1.150:8080";
+    public static final String email_address = "tranquangminh116@gmail.com";
+    public static final String email_password = "";
+    public static final String secretKey = "";
+}

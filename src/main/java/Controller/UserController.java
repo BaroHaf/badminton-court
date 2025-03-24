@@ -1,7 +1,7 @@
 package Controller;
 
 import Dao.UserDao;
-import Model.Enum.Role;
+import Model.Constant.Role;
 import Model.User;
 import Util.Config;
 import Util.Mail;

@@ -1,6 +1,6 @@
 package Filter;
 
-import Model.Enum.Role;
+import Model.Constant.Role;
 import Model.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

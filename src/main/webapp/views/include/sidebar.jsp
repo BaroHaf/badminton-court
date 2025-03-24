@@ -1,4 +1,4 @@
-<%@ page import="Model.Enum.Role" %>
+<%@ page import="Model.Constant.Role" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% User side_bar_user = (User) request.getSession().getAttribute("user");%>
 <aside id="sidebar" class="sidebar">
@@ -29,6 +29,12 @@
                 <li class="nav-heading">Khách hàng</li>
             <% } else { %>
                 <li class="nav-heading">Chủ sân</li>
+                <li class="nav-item">
+                    <a class="nav-link " href="<%=request.getContextPath()%>/court-owner">
+                        <i class="bi bi-grid"></i>
+                        <span>Quản lý sân cầu</span>
+                    </a>
+                </li>
             <% } %>
         <% } %>
     </ul>

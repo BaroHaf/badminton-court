@@ -1,4 +1,4 @@
-package Model.Enum;
+package Model.Constant;
 
 public enum Role {
     CUSTOMER,

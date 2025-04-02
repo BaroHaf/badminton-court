@@ -1,4 +1,7 @@
 <%@ page import="Model.User" %>
+<%@ page import="Dao.BookingDao" %>
+<%@ page import="Model.Booking" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% User user = (User) request.getSession().getAttribute("user");%>
 <header id="header" class="header fixed-top d-flex align-items-center">
@@ -44,20 +47,18 @@
 
                 <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                     <i class="bi bi-bell"></i>
-                    <span class="badge bg-primary badge-number">4</span>
+                    <span class="badge bg-primary badge-number"><%=user.getBookings().size()%></span>
                 </a><!-- End Notification Icon -->
-
+                <% List<Booking> pendingBookings = new BookingDao().getPendingBookingsByUserId(user.getId()); %>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                     <li class="dropdown-header">
-                        You have 4 new notifications
-                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+                        Bạn có <%= pendingBookings.size() %> bookings chưa thanh toán
                     </li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
 
                     <li class="notification-item">
-                        <i class="bi bi-exclamation-circle text-warning"></i>
                         <div>
                             <h4>Lorem Ipsum</h4>
                             <p>Quae dolorem earum veritatis oditseno</p>
@@ -70,7 +71,6 @@
                     </li>
 
                     <li class="notification-item">
-                        <i class="bi bi-x-circle text-danger"></i>
                         <div>
                             <h4>Atque rerum nesciunt</h4>
                             <p>Quae dolorem earum veritatis oditseno</p>
@@ -83,7 +83,6 @@
                     </li>
 
                     <li class="notification-item">
-                        <i class="bi bi-check-circle text-success"></i>
                         <div>
                             <h4>Sit rerum fuga</h4>
                             <p>Quae dolorem earum veritatis oditseno</p>
@@ -96,7 +95,6 @@
                     </li>
 
                     <li class="notification-item">
-                        <i class="bi bi-info-circle text-primary"></i>
                         <div>
                             <h4>Dicta reprehenderit</h4>
                             <p>Quae dolorem earum veritatis oditseno</p>
@@ -108,10 +106,11 @@
                         <hr class="dropdown-divider">
                     </li>
                     <li class="dropdown-footer">
-                        <a href="#">Show all notifications</a>
+                        <a href="<%=request.getContextPath()%>/customer/bookings"><span class="badge rounded-pill bg-primary p-2 ms-2">Xem tất cả</span></a>
                     </li>
 
-                </ul><!-- End Notification Dropdown Items -->
+                </ul>
+                    <!-- End Notification Dropdown Items -->
 
             </li>
                 <img src="<%=request.getContextPath()%>/<%=user.getAvatar()%>" style="width: 40px;height: 40px;object-fit: cover" alt="Profile" class="rounded-circle">

@@ -105,7 +105,7 @@ public class VenueController {
             if (venue == null) {
                 req.getSession().setAttribute("warning", "Sân không tồn tại");
             } else {
-                Court check = new CourtDao().findByName(name);
+                Court check = new CourtDao().findByName(name, venueId);
                 if (check != null){
                     req.getSession().setAttribute("warning", "Số sân đã tồn tại.");
                 } else {
@@ -119,6 +119,16 @@ public class VenueController {
                 }
             }
             resp.sendRedirect(req.getContextPath() + "/court-owner/detail?id=" + venueId);
+        }
+    }
+    @WebServlet("/venue-detail")
+    public static class ViewVenueDetailServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long venueId = Long.parseLong(req.getParameter("id"));
+            Venue venue = new VenueDao().getById(venueId);
+            req.setAttribute("venue", venue);
+            req.getRequestDispatcher("/views/public/venue-detail.jsp").forward(req, resp);
         }
     }
 }

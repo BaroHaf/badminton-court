@@ -3,10 +3,12 @@ package Util;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-public class Json {
+public class Util {
     public static class LocalTimeAdapter implements JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
         private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -26,8 +28,11 @@ public class Json {
             .setPrettyPrinting()
             .create();
 
-    // Convert an object to JSON string
     public static String toJson(Object o) {
         return gson.toJson(o);
+    }
+    public static double calculateHourDifference(LocalDateTime start, LocalDateTime end) {
+        long minutes = Duration.between(start, end).toMinutes();
+        return minutes / 60.0;
     }
 }

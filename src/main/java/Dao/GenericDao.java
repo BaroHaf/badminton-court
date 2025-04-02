@@ -40,11 +40,40 @@ public abstract class GenericDao<T> {
         }
     }
 
+    public void saveAll(List<T> entities) {
+        EntityTransaction transaction = entityManager.getTransaction();
+        try {
+            transaction.begin();
+            for (T entity : entities) {
+                entityManager.persist(entity);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        }
+    }
+
+
     public void update(T entity) {
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
             entityManager.merge(entity);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    public void updateAll(List<T> entities) {
+        EntityTransaction transaction = entityManager.getTransaction();
+        try {
+            transaction.begin();
+            for (T entity : entities) {
+                entityManager.merge(entity);
+            }
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();

@@ -123,9 +123,7 @@
             <td><%= venue.getOpenTime() != null ? venue.getOpenTime().format(timeFormatter) : "N/A" %></td>
             <td><%= venue.getCloseTime() != null ? venue.getCloseTime().format(timeFormatter) : "N/A" %></td>
             <td>
-              <a href="<%=request.getContextPath()%>/court-owner/detail?id=<%= venue.getId() %>" class="btn btn-primary btn-sm">Chi tiết</a>
-              <a href="deleteVenue?id=<%= venue.getId() %>" class="btn btn-danger btn-sm"
-                 onclick="return confirm('Are you sure you want to delete this venue?');">Delete</a>
+              <a href="<%=request.getContextPath()%>/court-owner/detail?id=<%= venue.getId() %>" class="btn btn-primary btn-sm w-100">Chi tiết</a>
             </td>
           </tr>
           <%

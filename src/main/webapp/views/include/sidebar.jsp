@@ -25,8 +25,20 @@
                         <span>Quản lý người dùng</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="<%=request.getContextPath()%>/admin/voucher">
+                        <i class="bi bi-grid"></i>
+                        <span>Quản lý voucher</span>
+                    </a>
+                </li>
             <% } else if (side_bar_user.getRole() == Role.CUSTOMER) { %>
                 <li class="nav-heading">Khách hàng</li>
+                <li class="nav-item">
+                    <a class="nav-link " href="<%=request.getContextPath()%>/customer/bookings">
+                        <i class="bi bi-grid"></i>
+                        <span>Danh sách bookings</span>
+                    </a>
+                </li>
             <% } else { %>
                 <li class="nav-heading">Chủ sân</li>
                 <li class="nav-item">

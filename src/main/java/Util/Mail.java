@@ -1,10 +1,13 @@
 package Util;
 
+import Dao.UserDao;
+import Model.User;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Properties;
 
 public class Mail {

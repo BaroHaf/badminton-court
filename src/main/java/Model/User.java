@@ -4,6 +4,8 @@ import Model.Constant.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +25,8 @@ public class User extends DistributedEntity {
     private String token;
     private boolean isVerified;
     private boolean isBlocked;
+    @OneToMany(mappedBy = "user")
+    private List<Booking> bookings;
     @Enumerated(EnumType.STRING)
     private Role role;
 

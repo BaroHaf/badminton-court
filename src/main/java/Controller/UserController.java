@@ -77,7 +77,11 @@ public class UserController {
             } else {
                 String token = UUID.randomUUID().toString() + System.currentTimeMillis();
                 password = BCrypt.hashpw(password, BCrypt.gensalt());
-                User user = new User(email, username, password, phone, Role.CUSTOMER, "uploads/default-avatar.png", false, false, token);
+                Role role = Role.valueOf(req.getParameter("role"));
+                if (role == Role.ADMIN) {
+                    role = Role.CUSTOMER;
+                }
+                User user = new User(email, username, password, phone, role, "uploads/default-avatar.png", false, false, token);
                 new UserDao().save(user);
                 // send mail
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -87,7 +91,7 @@ public class UserController {
                         String html = "Chúc mừng bạn đã đăng kí thành công, vui lòng nhấn vào <a href='url'>đây</a> để xác thực email của bạn.".replace("url", url);
                         Mail.send(email, "Đăng kí tài khoản", html);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        System.out.println(e.getMessage());
                     }
                 });
                 executorService.shutdown();

@@ -30,6 +30,8 @@ public class Booking extends DistributedEntity {
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
+    private double amount;
+
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;

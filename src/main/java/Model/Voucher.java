@@ -25,9 +25,9 @@ public class Voucher extends DistributedEntity{
 
     public long calculateDiscount(long amount) {
         if (type == VoucherType.PERCENTAGE){
-            return amount * discount;
+            return amount * (100 - discount) / 100;
         } else {
-            return amount - discount;
+            return amount - discount * 100L;
         }
     }
 }

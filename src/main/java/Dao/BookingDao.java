@@ -85,4 +85,11 @@ public class BookingDao extends GenericDao<Booking>{
         query.setParameter("to", to);
         return query.getResultList();
     }
+    public List<Booking> getConfirmedBookingIn(LocalDateTime start, LocalDateTime end){
+        TypedQuery<Booking> query  = entityManager.createQuery("select b from Booking b join fetch b.court join fetch b.user where b.status = :status and b.startTime >= :start and endTime < :end order by b.startTime", Booking.class);
+        query.setParameter("status", BookingStatus.CONFIRMED);
+        query.setParameter("start", start);
+        query.setParameter("end", end);
+        return query.getResultList();
+    }
 }

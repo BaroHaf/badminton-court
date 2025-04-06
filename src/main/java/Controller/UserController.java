@@ -5,7 +5,9 @@ import Model.Constant.Role;
 import Model.User;
 import Util.Config;
 import Util.Mail;
+import Util.UploadImage;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -235,6 +237,20 @@ public class UserController {
                 req.getSession().setAttribute("success", "Tạo tài khoản thành công.");
                 resp.sendRedirect(req.getContextPath() + "/admin/users");
             }
+        }
+    }
+
+    @WebServlet("/user/avatar")
+    @MultipartConfig
+    public static class UserAvatar extends HttpServlet{
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String filename = UploadImage.saveImage(req, "avatar");
+            User user = (User) req.getSession().getAttribute("user");
+            user.setAvatar(filename);
+            new UserDao().update(user);
+            req.getSession().setAttribute("user", user);
+            resp.sendRedirect(req.getHeader("referer"));
         }
     }
 }

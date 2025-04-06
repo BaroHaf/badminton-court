@@ -1,7 +1,9 @@
 package Controller;
 
+import Dao.BookingDao;
 import Dao.CourtDao;
 import Dao.VenueDao;
+import Model.Booking;
 import Model.Court;
 import Model.User;
 import Model.Venue;
@@ -14,6 +16,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -126,8 +131,26 @@ public class VenueController {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             long venueId = Long.parseLong(req.getParameter("id"));
+            String from = req.getParameter("from");
+            String to = req.getParameter("to");
+            LocalDateTime startDateTime;
+            LocalDateTime endDateTime;
+            if (from.isEmpty() && to.isEmpty()) {
+                LocalDate today = LocalDate.now();
+                LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+                startDateTime = startOfWeek.atStartOfDay();
+                LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY);
+                endDateTime = endOfWeek.atTime(23, 59);
+            } else {
+                LocalDate startDate = LocalDate.parse(from);
+                LocalDate endDate = LocalDate.parse(to);
+                startDateTime = startDate.atStartOfDay();
+                endDateTime = endDate.atTime(23, 59);
+            }
+            List<Booking> bookings = new BookingDao().getConfirmedBookingIn(startDateTime, endDateTime);
             Venue venue = new VenueDao().getById(venueId);
             req.setAttribute("venue", venue);
+            req.setAttribute("bookings", bookings);
             req.getRequestDispatcher("/views/public/venue-detail.jsp").forward(req, resp);
         }
     }

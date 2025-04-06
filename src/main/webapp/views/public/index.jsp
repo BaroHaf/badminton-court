@@ -54,7 +54,7 @@
                         <p class="card-text">
                             <strong>Chủ sân:</strong> <%=venues.get(i).getOwner().getUsername()%>
                         </p>
-                        <a href="<%=request.getContextPath()%>/venue-detail?id=<%= venues.get(i).getId() %>" class="btn btn-primary">Xem chi tiết</a>
+                        <a href="<%=request.getContextPath()%>/venue-detail?id=<%= venues.get(i).getId() %>&from=&to=" class="btn btn-primary">Xem chi tiết</a>
                     </div>
                 </div>
             </div>

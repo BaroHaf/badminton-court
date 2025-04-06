@@ -40,6 +40,11 @@
           </div>
           <div class="card-body">
             <img src="<%=request.getContextPath()%>/<%=user.getAvatar()%>" alt="User avatar" style="width:100%; height: 500px; object-fit: contain;">
+            <form action="<%=request.getContextPath()%>/user/avatar" method="post" enctype="multipart/form-data">
+              <label for="avatar">Thay đổi ảnh đại diện</label>
+              <input type="file" name="avatar" id="avatar" accept="image/*">
+              <button class="btn btn-success w-100">Cập nhật</button>
+            </form>
           </div>
         </div>
       </div>

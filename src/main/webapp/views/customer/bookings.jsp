@@ -77,6 +77,8 @@
                         <form action="<%=request.getContextPath()%>/customer/payment" method="post"
                               onsubmit="checkEmptyForm(event)">
                             <input type="hidden" name="ids" id="ids">
+                            <label for="voucherCode">Nhập mã giảm giá (nếu có)</label>
+                            <input id="voucherCode" name="voucherCode" type="text" class="form-control w-25">
                             <button id="payment_btn" class="btn btn-success m-1">Thanh toán</button>
                         </form>
                         <table class="table table-striped table-bordered">

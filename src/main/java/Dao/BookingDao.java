@@ -52,4 +52,37 @@ public class BookingDao extends GenericDao<Booking>{
         query.setParameter("id", booking_id);
         return query.getSingleResult();
     }
+    public List<Booking> getAllByOwnerId(long ownerId){
+        TypedQuery<Booking> query = entityManager.createQuery("select b from Booking b where b.court.venue.owner.id = :ownerID", Booking.class);
+        query.setParameter("ownerID", ownerId);
+        return query.getResultList();
+    }
+    public List<Booking> getBookingsBefore(long ownerId, LocalDateTime to) {
+        TypedQuery<Booking> query = entityManager.createQuery(
+                "select b from Booking b where b.court.venue.owner.id = :ownerId and b.startTime <= :to",
+                Booking.class
+        );
+        query.setParameter("ownerId", ownerId);
+        query.setParameter("to", to);
+        return query.getResultList();
+    }
+    public List<Booking> getBookingsAfter(long ownerId, LocalDateTime from) {
+        TypedQuery<Booking> query = entityManager.createQuery(
+                "select b from Booking b where b.court.venue.owner.id = :ownerId and b.startTime >= :from",
+                Booking.class
+        );
+        query.setParameter("ownerId", ownerId);
+        query.setParameter("from", from);
+        return query.getResultList();
+    }
+    public List<Booking> getBookingsBetween(long ownerId, LocalDateTime from, LocalDateTime to) {
+        TypedQuery<Booking> query = entityManager.createQuery(
+                "select b from Booking b where b.court.venue.owner.id = :ownerId and b.startTime between :from and :to",
+                Booking.class
+        );
+        query.setParameter("ownerId", ownerId);
+        query.setParameter("from", from);
+        query.setParameter("to", to);
+        return query.getResultList();
+    }
 }

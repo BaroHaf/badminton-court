@@ -47,6 +47,24 @@
                         <span>Quản lý sân cầu</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="<%=request.getContextPath()%>/court-owner/products">
+                        <i class="bi bi-grid"></i>
+                        <span>Quản lý sản phẩm</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="<%=request.getContextPath()%>/court-owner/sale-record">
+                        <i class="bi bi-grid"></i>
+                        <span>Quản lý bán hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="<%=request.getContextPath()%>/court-owner/revenue?from=&to=">
+                        <i class="bi bi-grid"></i>
+                        <span>Doanh thu</span>
+                    </a>
+                </li>
             <% } %>
         <% } %>
     </ul>

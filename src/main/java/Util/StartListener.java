@@ -54,7 +54,7 @@ public class StartListener implements ServletContextListener {
             List<Court> courts = new ArrayList<>();
             for (int i = 0; i < venues.size(); i++) {
                 for (int j = 0; j < 12; j++) {
-                    courts.add(new Court(String.valueOf(j), true, 80000, venues.get(i)));
+                    courts.add(new Court(String.valueOf(j + 1), true, 80000, venues.get(i)));
                 }
             }
             new CourtDao().saveAll(courts);

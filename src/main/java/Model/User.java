@@ -1,5 +1,6 @@
 package Model;
 
+import Model.Constant.Rank;
 import Model.Constant.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,8 +30,10 @@ public class User extends DistributedEntity {
     private List<Booking> bookings;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    private Rank rank;
 
-    public User(String email, String username, String password, String phone, Role role, String avatar, boolean isVerified, boolean isBlocked, String token) {
+    public User(String email, String username, String password, String phone, Role role, String avatar, boolean isVerified, boolean isBlocked, String token, Rank rank) {
         this.email = email;
         this.username = username;
         this.password = password;
@@ -40,9 +43,10 @@ public class User extends DistributedEntity {
         this.isVerified = isVerified;
         this.isBlocked = isBlocked;
         this.token = token;
+        this.rank = rank;
     }
 
-    public User(String email, String username, String password, String avatar, String phone, boolean isVerified, boolean isBlocked, Role role) {
+    public User(String email, String username, String password, String avatar, String phone, boolean isVerified, boolean isBlocked, Role role, Rank rank) {
         this.email = email;
         this.username = username;
         this.password = password;
@@ -51,5 +55,6 @@ public class User extends DistributedEntity {
         this.isVerified = isVerified;
         this.isBlocked = isBlocked;
         this.role = role;
+        this.rank = rank;
     }
 }

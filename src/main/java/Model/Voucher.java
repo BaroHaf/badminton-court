@@ -1,5 +1,6 @@
 package Model;
 
+import Model.Constant.Rank;
 import Model.Constant.VoucherType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,6 +23,8 @@ public class Voucher extends DistributedEntity{
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean disabled;
+    @Enumerated(EnumType.STRING)
+    private Rank forRank;
 
     public long calculateDiscount(long amount) {
         if (type == VoucherType.PERCENTAGE){

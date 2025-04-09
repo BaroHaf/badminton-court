@@ -1,6 +1,7 @@
 package Controller;
 
 import Dao.UserDao;
+import Model.Constant.Rank;
 import Model.Constant.Role;
 import Model.User;
 import Util.Config;
@@ -37,8 +38,8 @@ public class UserController {
                 req.getSession().setAttribute("warning", "Tài khoản hoặc mật khẩu không đúng.");
                 resp.sendRedirect(req.getContextPath() + "/login");
             } else {
-                if (BCrypt.checkpw(password, user.getPassword())){
-                    if (!user.isVerified()){
+                if (BCrypt.checkpw(password, user.getPassword())) {
+                    if (!user.isVerified()) {
                         req.getSession().setAttribute("warning", "Tài khoản chưa được kích hoạt.");
                         resp.sendRedirect(req.getContextPath() + "/login");
                     } else {
@@ -83,7 +84,7 @@ public class UserController {
                 if (role == Role.ADMIN) {
                     role = Role.CUSTOMER;
                 }
-                User user = new User(email, username, password, phone, role, "uploads/default-avatar.png", false, false, token);
+                User user = new User(email, username, password, phone, role, "uploads/default-avatar.png", false, false, token, Rank.BRONZE);
                 new UserDao().save(user);
                 // send mail
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -121,14 +122,16 @@ public class UserController {
             resp.sendRedirect(req.getContextPath() + "/login");
         }
     }
+
     @WebServlet("/logout")
-    public static class LogoutServlet extends HttpServlet{
+    public static class LogoutServlet extends HttpServlet {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             req.getSession().invalidate();
             resp.sendRedirect(req.getContextPath() + "/");
         }
     }
+
     @WebServlet("/admin/users")
     public static class AdminUsersServlet extends HttpServlet {
         @Override
@@ -149,14 +152,14 @@ public class UserController {
             Role role = Role.valueOf(req.getParameter("role"));
             long id = Integer.parseInt(req.getParameter("id"));
             User user = new UserDao().getById(id);
-            if (user != null){
+            if (user != null) {
                 user.setUsername(username);
                 user.setEmail(email);
                 user.setPhone(phone);
                 user.setVerified(verified);
                 user.setBlocked(blocked);
                 user.setRole(role);
-                if (!password.isEmpty()){
+                if (!password.isEmpty()) {
                     user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
                 }
                 new UserDao().update(user);
@@ -169,7 +172,7 @@ public class UserController {
     }
 
     @WebServlet("/user/profile")
-    public static class UserProfile extends HttpServlet{
+    public static class UserProfile extends HttpServlet {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             req.getRequestDispatcher("/views/user/profile.jsp").forward(req, resp);
@@ -182,28 +185,28 @@ public class UserController {
             String phone = req.getParameter("phone");
             String password = req.getParameter("password");
             User user = (User) req.getSession().getAttribute("user");
-            if (!user.getUsername().equals(username)){
-                if (new UserDao().findByUsername(username) != null){
+            if (!user.getUsername().equals(username)) {
+                if (new UserDao().findByUsername(username) != null) {
                     req.getSession().setAttribute("warning", "Username đã được sử dụng.");
                 } else {
                     user.setUsername(username);
                 }
             }
-            if (!user.getEmail().equals(email)){
-                if (new UserDao().findByEmail(email) != null){
+            if (!user.getEmail().equals(email)) {
+                if (new UserDao().findByEmail(email) != null) {
                     req.getSession().setAttribute("warning", "Email đã được sử dụng.");
                 } else {
                     user.setEmail(email);
                 }
             }
-            if (!user.getPhone().equals(phone)){
-                if (new UserDao().findByPhone(phone) != null){
+            if (!user.getPhone().equals(phone)) {
+                if (new UserDao().findByPhone(phone) != null) {
                     req.getSession().setAttribute("warning", "Số điện thoại đang được sử dụng.");
                 } else {
                     user.setPhone(phone);
                 }
             }
-            if (!password.isEmpty()){
+            if (!password.isEmpty()) {
                 user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
             }
             new UserDao().update(user);
@@ -211,8 +214,9 @@ public class UserController {
             resp.sendRedirect(req.getContextPath() + "/user/profile");
         }
     }
+
     @WebServlet("/admin/create-user")
-    public static class AdminCreatUser extends HttpServlet{
+    public static class AdminCreatUser extends HttpServlet {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             String username = req.getParameter("username");
@@ -221,6 +225,7 @@ public class UserController {
             String password = req.getParameter("password");
             boolean verified = Boolean.parseBoolean(req.getParameter("verified"));
             boolean blocked = Boolean.parseBoolean(req.getParameter("blocked"));
+            Rank rank = Rank.valueOf(req.getParameter("rank"));
             Role role = Role.valueOf(req.getParameter("role"));
             if (new UserDao().findByEmail(email) != null) {
                 req.getSession().setAttribute("warning", "Email đang được sử dụng.");
@@ -232,7 +237,7 @@ public class UserController {
                 req.getSession().setAttribute("warning", "Username đang được sử dụng.");
                 resp.sendRedirect(req.getContextPath() + "/admin/create-user");
             } else {
-                User user = new User(email, username, password, "uploads/default-avatar.png", phone, verified, blocked, role);
+                User user = new User(email, username, password, "uploads/default-avatar.png", phone, verified, blocked, role, rank);
                 new UserDao().save(user);
                 req.getSession().setAttribute("success", "Tạo tài khoản thành công.");
                 resp.sendRedirect(req.getContextPath() + "/admin/users");
@@ -242,7 +247,7 @@ public class UserController {
 
     @WebServlet("/user/avatar")
     @MultipartConfig
-    public static class UserAvatar extends HttpServlet{
+    public static class UserAvatar extends HttpServlet {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             String filename = UploadImage.saveImage(req, "avatar");
@@ -251,6 +256,57 @@ public class UserController {
             new UserDao().update(user);
             req.getSession().setAttribute("user", user);
             resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+
+    @WebServlet("/forgot-password")
+    public static class ForgotPassword extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.getRequestDispatcher("/views/public/forgot-password.jsp").forward(req, resp);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String email = req.getParameter("email");
+            User user = new UserDao().findByEmail(email);
+            if (user != null) {
+                String uuid = UUID.randomUUID().toString();
+                user.setToken(uuid);
+                new UserDao().save(user);
+            }
+            req.getSession().setAttribute("success", "Vui lòng kiểm tra email");
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+
+    @WebServlet("/reset-password")
+    public static class ResetPassword extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.getRequestDispatcher("/views/public/reset-password.jsp").forward(req, resp);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String token = req.getParameter("token");
+            User user = new UserDao().findByToken(token);
+            if (user != null) {
+                String password = req.getParameter("password");
+                String re_password = req.getParameter("re_password");
+                if (password.equals(re_password) && !password.isEmpty()) {
+                    user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+                    new UserDao().update(user);
+                    req.getSession().setAttribute("success", "Đặt lại mật khẩu thành công.");
+                    resp.sendRedirect(req.getContextPath() + "/login");
+                } else {
+                    req.getSession().setAttribute("warning", "Mật khẩu không khớp.");
+                    resp.sendRedirect(req.getHeader("referer"));
+                }
+            } else {
+                req.getSession().setAttribute("warning", "Token không tồn tại.");
+                resp.sendRedirect(req.getHeader("referer"));
+            }
         }
     }
 }

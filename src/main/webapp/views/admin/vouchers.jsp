@@ -48,6 +48,14 @@
                         <label>Ngày kết thúc</label>
                         <input type="date" name="endDate" class="form-control" required>
                     </div>
+                    <div class="mb-3">
+                        <label>Áp dụng cho hạng</label>
+                        <select name="forRank" id="forRank">
+                            <option value="BRONZE">BRONZE</option>
+                            <option value="SILVER">SILVER</option>
+                            <option value="GOLD">GOLD</option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-success">Thêm</button>
                 </form>
             </div>
@@ -64,6 +72,7 @@
                         <th>Ngày bắt đầu</th>
                         <th>Ngày kết thúc</th>
                         <th>Vô hiệu hóa</th>
+                        <th>Áp dụng cho hạng</th>
                         <th>Hành động</th>
                     </tr>
                     </thead>
@@ -78,6 +87,7 @@
                         <td><%= v.getStartDate() %></td>
                         <td><%= v.getEndDate() %></td>
                         <td><%= v.isDisabled() ? "Có" : "Không" %></td>
+                        <td><%= v.getForRank() %></td>
                         <td>
                             <button onclick="changeUpdateModalForm(<%= v.getId() %>, '<%= v.getCode() %>', '<%= v.getType() %>', <%= v.getDiscount() %>, '<%= v.getStartDate() %>', '<%= v.getEndDate() %>', <%= v.isDisabled() %>)" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#UpdateModal">
                                 Cập nhật

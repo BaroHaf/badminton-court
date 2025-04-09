@@ -1,6 +1,7 @@
 package Controller;
 
 import Dao.VoucherDao;
+import Model.Constant.Rank;
 import Model.Constant.VoucherType;
 import Model.Voucher;
 import jakarta.servlet.ServletException;
@@ -27,7 +28,8 @@ public class VoucherController {
             int discount = Integer.parseInt(req.getParameter("discount"));
             LocalDate startDate = LocalDate.parse(req.getParameter("startDate"));
             LocalDate endDate = LocalDate.parse(req.getParameter("endDate"));
-            Voucher voucher = new Voucher(code, type, discount, startDate, endDate, false);
+            Rank forRank = Rank.valueOf(req.getParameter("forRank"));
+            Voucher voucher = new Voucher(code, type, discount, startDate, endDate, false, forRank);
             new VoucherDao().save(voucher);
             resp.sendRedirect(req.getContextPath() + "/admin/voucher");
         }
@@ -42,7 +44,6 @@ public class VoucherController {
             VoucherType type = VoucherType.valueOf(req.getParameter("type"));
             int discount = Integer.parseInt(req.getParameter("discount"));
             boolean disabled = Boolean.parseBoolean(req.getParameter("disabled"));
-            System.out.println(disabled);
             LocalDate startDate = LocalDate.parse(req.getParameter("startDate"));
             LocalDate endDate = LocalDate.parse(req.getParameter("endDate"));
             Voucher voucher = new VoucherDao().getById(id);

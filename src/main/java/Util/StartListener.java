@@ -3,6 +3,7 @@ package Util;
 import Dao.CourtDao;
 import Dao.UserDao;
 import Dao.VenueDao;
+import Model.Constant.Rank;
 import Model.Constant.Role;
 import Model.Court;
 import Model.User;
@@ -29,9 +30,9 @@ public class StartListener implements ServletContextListener {
         List<User> users = em.createQuery("select u from User u", User.class).getResultList();
         if (users.isEmpty()) {
             String password = "$2a$10$5C.8P6dGpCAYjkt3noBrAORPdyrX.Uy07Z46lMmsClcC1oCy0pBwi"; // 123456
-            User admin = new User("admin@gmail.com", "admin", password, "uploads/default-avatar.png", "0123456787", true, false, Role.ADMIN);
-            User customer = new User("customer@gmail.com", "customer", password, "uploads/default-avatar.png", "0123456789", true, false, Role.CUSTOMER);
-            User owner = new User("owner@gmail.com", "owner", password, "uploads/default-avatar.png", "0123456788", true, false, Role.COURT_OWNER);
+            User admin = new User("admin@gmail.com", "admin", password, "uploads/default-avatar.png", "0123456787", true, false, Role.ADMIN, null);
+            User customer = new User("customer@gmail.com", "customer", password, "uploads/default-avatar.png", "0123456789", true, false, Role.CUSTOMER, Rank.BRONZE);
+            User owner = new User("owner@gmail.com", "owner", password, "uploads/default-avatar.png", "0123456788", true, false, Role.COURT_OWNER, null);
             users.addAll(List.of(admin, customer, owner));
             new UserDao().saveAll(users);
             users = new UserDao().getAll();

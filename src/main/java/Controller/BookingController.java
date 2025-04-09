@@ -71,11 +71,4 @@ public class BookingController {
             resp.sendRedirect(req.getHeader("referer"));
         }
     }
-    /*@WebServlet("/court-owner/set-court-time")
-    public static class SetCourtTimeServlet extends HttpServlet {
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            long court_id = Long.parseLong(req.getParameter("court_id"));
-        }
-    }*/
 }

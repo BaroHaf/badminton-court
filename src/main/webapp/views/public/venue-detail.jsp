@@ -3,6 +3,7 @@
 <%@ page import="Dao.ReviewDao" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.DayOfWeek" %>
+<%@ page import="java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% Venue venue = (Venue) request.getAttribute("venue");%>
 <!DOCTYPE html>
@@ -54,6 +55,18 @@
                 </p>
                 <p><strong>Số lượng sân:</strong> <%= venue.getCourts().size()%>
                 </p>
+                <%
+                    Map<Double, List<String>> courtPriceMap = (Map<Double, List<String>>) request.getAttribute("courtPriceMap");
+                    for (Map.Entry<Double, List<String>> entry : courtPriceMap.entrySet()) {
+                        double price = entry.getKey();
+                        List<String> courtNames = entry.getValue();
+                %>
+                <p>
+                    <strong>Sân:</strong> <%= String.join(",", courtNames) %> - <%= (int)price %>k/h
+                </p>
+                <%
+                    }
+                %>
                 <form action="<%=request.getContextPath()%>/customer/book" method="post">
                     <div class="col-12">
                         <label for="court_id" class="form-label">Chọn sân</label>

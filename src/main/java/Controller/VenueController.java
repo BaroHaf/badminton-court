@@ -20,7 +20,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class VenueController {
     @WebServlet("/court-owner")
@@ -149,9 +152,37 @@ public class VenueController {
             }
             List<Booking> bookings = new BookingDao().getConfirmedBookingIn(startDateTime, endDateTime);
             Venue venue = new VenueDao().getById(venueId);
+            Map<Double, List<String>> courtPriceMap = new HashMap<>();
+            for (Court court : venue.getCourts()) {
+                double price = court.getPricePerHour();
+                String courtName = court.getName();
+
+                courtPriceMap.computeIfAbsent(price, k -> new ArrayList<>()).add(courtName);
+            }
+            req.setAttribute("courtPriceMap", courtPriceMap);
             req.setAttribute("venue", venue);
             req.setAttribute("bookings", bookings);
             req.getRequestDispatcher("/views/public/venue-detail.jsp").forward(req, resp);
+        }
+    }
+    @WebServlet("/search")
+    public static class SearchServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String searchQuery = req.getParameter("searchQuery");
+            String priceFromStr = req.getParameter("priceFrom");
+            String priceToStr = req.getParameter("priceTo");
+            String openTimeStr = req.getParameter("openTime");
+            String closeTimeStr = req.getParameter("closeTime");
+
+            Double priceFrom = priceFromStr != null && !priceFromStr.isEmpty() ? Double.parseDouble(priceFromStr) : null;
+            Double priceTo = priceToStr != null && !priceToStr.isEmpty() ? Double.parseDouble(priceToStr) : null;
+            LocalTime openTime = openTimeStr != null && !openTimeStr.isEmpty() ? LocalTime.parse(openTimeStr) : null;
+            LocalTime closeTime = closeTimeStr != null && !closeTimeStr.isEmpty() ? LocalTime.parse(closeTimeStr) : null;
+
+            List<Venue> venues = new VenueDao().searchVenues(searchQuery, priceFrom, priceTo, openTime, closeTime);
+            req.setAttribute("venues", venues);
+            req.getRequestDispatcher("/views/public/search.jsp").forward(req, resp);
         }
     }
 }

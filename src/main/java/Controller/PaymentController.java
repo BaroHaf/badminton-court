@@ -7,6 +7,7 @@ import Model.Booking;
 import Model.Constant.BookingStatus;
 import Model.Constant.TransactionStatus;
 import Model.Payment;
+import Model.User;
 import Model.Voucher;
 import Util.Util;
 import Util.VNPayUtil;
@@ -38,6 +39,7 @@ public class PaymentController {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             long[] ids = Arrays.stream(req.getParameter("ids").split(",")).mapToLong(Long::parseLong).toArray();
+            User user = (User) req.getSession().getAttribute("user");
             List<Booking> bookings = new BookingDao().getBookingsIn(ids);
             String voucherCode = req.getParameter("voucherCode");
             String vnp_Version = "2.1.0";
@@ -49,7 +51,11 @@ public class PaymentController {
             if (!voucherCode.isEmpty()){
                  voucher = new VoucherDao().findByCodeNotDisable(voucherCode);
                 if (voucher != null) {
-                    amount = voucher.calculateDiscount(amount);
+                    if (user.getRank().ordinal() < voucher.getForRank().ordinal()){
+                        check = false;
+                    } else {
+                        amount = voucher.calculateDiscount(amount);
+                    }
                 } else {
                     check = false;
                 }
@@ -124,7 +130,7 @@ public class PaymentController {
                 String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
                 resp.sendRedirect(paymentUrl);
             } else {
-                req.getSession().setAttribute("warning", "Mã giảm giá không tồn tại.");
+                req.getSession().setAttribute("warning", "Mã giảm giá không tồn tại, hoặc bạn không thể dùng mã này.");
                 resp.sendRedirect(req.getHeader("referer"));
             }
 

@@ -53,7 +53,10 @@
                                         <button class="btn btn-primary w-100" type="submit">Đăng nhập</button>
                                     </div>
                                     <div class="col-12">
-                                        <p class="small mb-0">Don't have account? <a href="<%=request.getContextPath()%>/register">Tạo tài khoản mới</a></p>
+                                        <p class="small mb-0">Chưa có tài khoản? <a href="<%=request.getContextPath()%>/register">Tạo tài khoản mới</a></p>
+                                    </div>
+                                    <div class="col-12">
+                                        <p class="small mb-0">Quên mật khẩu? <a href="<%=request.getContextPath()%>/forgot-password">Lấy lại mật khẩu</a></p>
                                     </div>
                                 </form>
 

@@ -43,10 +43,10 @@ public class StartListener implements ServletContextListener {
             }
             System.out.println("Done seed users");
 
-            Venue venue1 = new Venue("Sân cầu lông số 1", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("07:00:00"), LocalTime.parse("22:00:00"), owner);
-            Venue venue2 = new Venue("Sân cầu lông số 2", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("08:00:00"), LocalTime.parse("23:00:00"), owner);
-            Venue venue3 = new Venue("Sân cầu lông số 3", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("06:00:00"), LocalTime.parse("23:00:00"), owner);
-            Venue venue4 = new Venue("Sân cầu lông số 4", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("09:00:00"), LocalTime.parse("21:00:00"), owner);
+            Venue venue1 = new Venue("Sân cầu lông Đa Phước", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("07:00:00"), LocalTime.parse("22:00:00"), owner);
+            Venue venue2 = new Venue("Sân cầu lông Pinpon", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("08:00:00"), LocalTime.parse("23:00:00"), owner);
+            Venue venue3 = new Venue("Sân cầu lông Arora", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("06:00:00"), LocalTime.parse("23:00:00"), owner);
+            Venue venue4 = new Venue("Sân cầu lông IndexSport", "Nguyễn Văn Linh, Hải Châu, Đà Nẵng", "uploads/500fbbbf-1980-4cd9-b9b5-5b16b7636d49-1742956113946.jpg", LocalTime.parse("09:00:00"), LocalTime.parse("21:00:00"), owner);
             List<Venue> venues = new ArrayList<>(List.of(venue1, venue2, venue3, venue4));
             new VenueDao().saveAll(venues);
             venues = new VenueDao().getAll();
@@ -55,7 +55,7 @@ public class StartListener implements ServletContextListener {
             List<Court> courts = new ArrayList<>();
             for (int i = 0; i < venues.size(); i++) {
                 for (int j = 0; j < 12; j++) {
-                    courts.add(new Court(String.valueOf(j + 1), true, 80000, venues.get(i)));
+                    courts.add(new Court(String.valueOf(j + 1), true, 80000, venues.get(i), false));
                 }
             }
             new CourtDao().saveAll(courts);

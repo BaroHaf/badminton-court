@@ -4,17 +4,13 @@ import Model.SaleRecord;
 import jakarta.persistence.TypedQuery;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class SaleRecordDao extends GenericDao<SaleRecord> {
     public SaleRecordDao() {
         super();
-    }
-    public List<SaleRecord> findAllByUserId(long userId) {
-        TypedQuery<SaleRecord> query = entityManager.createQuery("select s from SaleRecord s where s.owner.id = :id order by s.id desc", SaleRecord.class);
-        query.setParameter("id", userId);
-        return query.getResultList();
     }
     public List<SaleRecord> getSalesByOwnerId(long ownerId) {
         TypedQuery<SaleRecord> query = entityManager.createQuery(
@@ -45,7 +41,7 @@ public class SaleRecordDao extends GenericDao<SaleRecord> {
 
     public List<SaleRecord> getSalesBetween(long ownerId, LocalDateTime from, LocalDateTime to) {
         TypedQuery<SaleRecord> query = entityManager.createQuery(
-                "SELECT s FROM SaleRecord s WHERE s.owner.id = :ownerId AND s.createdAt BETWEEN :from AND :to",
+                "SELECT s FROM SaleRecord s WHERE s.owner.id = :ownerId AND s.createdAt BETWEEN :from AND :to order by id desc",
                 SaleRecord.class
         );
         query.setParameter("ownerId", ownerId);

@@ -13,12 +13,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class BookingController {
     @WebServlet("/customer/book")
     public static class BookingServlet extends HttpServlet {
+        public static boolean isStep30Minutes(LocalDateTime start, LocalDateTime end) {
+            Duration duration = Duration.between(start, end);
+            long minutes = duration.toMinutes();
+            return minutes % 30 == 0;
+        }
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             User user = (User) req.getSession().getAttribute("user");
@@ -26,6 +32,8 @@ public class BookingController {
             Court court = new CourtDao().getById(court_id);
             LocalDateTime start_time = LocalDateTime.parse(req.getParameter("start_time"));
             LocalDateTime end_time = LocalDateTime.parse(req.getParameter("end_time"));
+            boolean check = false;
+            Booking booking = new Booking();
             if (court == null){
                 req.getSession().setAttribute("warning", "Id sân cầu không hợp lệ.");
             } else if (court.getVenue().getOpenTime().isAfter(start_time.toLocalTime())){
@@ -35,19 +43,28 @@ public class BookingController {
             } else if (!new BookingDao().findWithCourtIdAndStartTimeAndEndTimeAndStatus(court_id, start_time, end_time).isEmpty()){
                 req.getSession().setAttribute("warning", "Giờ này đã có người đặt.");
             } else if (start_time.isAfter(end_time)) {
-                req.getSession().setAttribute("warning", "Giờ kết thúc phải sau giờ bắt đầu");
+                req.getSession().setAttribute("warning", "Giờ kết thúc phải sau giờ bắt đầu!");
+            } else if (!start_time.toLocalDate().equals(end_time.toLocalDate())) {
+                req.getSession().setAttribute("warning", "Thời gian bắt đầu và kết thúc phải trong cùng một ngày!");
+            } else if (!isStep30Minutes(start_time, end_time)){
+                req.getSession().setAttribute("warning", "Khoảng cách giữa giờ bắt đầu và kết thúc cách nhau bội số 30p!");
             } else {
-                Booking booking = new Booking();
                 booking.setUser(user);
                 booking.setCourt(court);
+                booking.setCourtName(court.getName());
+                booking.setVenueName(court.getVenue().getName());
                 booking.setStartTime(start_time);
                 booking.setEndTime(end_time);
                 booking.setAmount(0);
                 booking.setStatus(BookingStatus.PENDING);
                 new BookingDao().save(booking);
-                req.getSession().setAttribute("success", "Đặt thành công, giờ bạn có thể đến giỏ hàng và thanh toán.");
+                check = true;
             }
-            resp.sendRedirect(req.getHeader("referer"));
+            if (check){
+                resp.sendRedirect(req.getContextPath() + "/customer/payment?id=" + booking.getId() + "&voucherCode=" + req.getParameter("voucherCode"));
+            } else {
+                resp.sendRedirect(req.getHeader("referer"));
+            }
         }
     }
 

@@ -28,7 +28,7 @@ public class BookingDao extends GenericDao<Booking>{
         return query.getResultList();
     }
     public List<Booking> getAllByUserId(long user_id){
-        TypedQuery<Booking> query = entityManager.createQuery("select b from Booking b where b.user.id = :userId", Booking.class);
+        TypedQuery<Booking> query = entityManager.createQuery("select b from Booking b left join fetch b.review where b.user.id = :userId", Booking.class);
         query.setParameter("userId", user_id);
         return query.getResultList();
     }

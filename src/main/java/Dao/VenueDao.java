@@ -2,6 +2,7 @@ package Dao;
 
 import Model.Court;
 import Model.Venue;
+import Util.Util;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
@@ -32,12 +33,12 @@ public class VenueDao extends GenericDao<Venue>{
         Join<Venue, Court> courtJoin = root.join("courts", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
-
+        predicates.add(cb.isFalse(root.get("deleted")));
         if (query != null && !query.trim().isEmpty()) {
-            String likeQuery = "%" + query.trim().toLowerCase() + "%";
+            String likeQuery = "%" + Util.removeAccents(query.trim().toLowerCase()) + "%";
             predicates.add(cb.or(
-                    cb.like(cb.lower(root.get("name")), likeQuery),
-                    cb.like(cb.lower(root.get("address")), likeQuery)
+                    cb.like(cb.lower(root.get("normalizedName")), likeQuery),
+                    cb.like(cb.lower(root.get("normalizedAddress")), likeQuery)
             ));
         }
 

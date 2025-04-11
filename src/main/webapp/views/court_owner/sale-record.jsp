@@ -1,5 +1,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="Model.*" %>
+<%@ page import="Util.Util" %>
+<%@ page import="java.time.LocalDateTime" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   List<Product> products = (List<Product>) request.getAttribute("products");
@@ -67,7 +70,7 @@
       <!-- Danh sách bán hàng -->
       <div class="col-md-8">
         <div class="card">
-          <div class="card-header">Danh sách doanh thu</div>
+          <div class="card-header">Danh sách doanh thu cho ngày <%=LocalDate.now().toString()%></div>
           <div class="card-body">
             <table class="table table-bordered" id="saleRecordTable">
               <thead>

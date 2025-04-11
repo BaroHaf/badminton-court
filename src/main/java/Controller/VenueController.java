@@ -8,6 +8,7 @@ import Model.Court;
 import Model.User;
 import Model.Venue;
 import Util.UploadImage;
+import Util.Util;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -51,6 +52,7 @@ public class VenueController {
             resp.sendRedirect(req.getContextPath() + "/court-owner");
         }
     }
+
     @WebServlet("/court-owner/detail")
     @MultipartConfig
     public static class VenueDetailServlet extends HttpServlet {
@@ -74,7 +76,7 @@ public class VenueController {
                 String address = req.getParameter("address");
                 String openTime = req.getParameter("openTime");
                 String closeTime = req.getParameter("closeTime");
-                if (req.getPart("image") != null){
+                if (req.getPart("image") != null) {
                     String image = UploadImage.saveImage(req, "image");
                     venue.setImage(image);
                 }
@@ -88,6 +90,7 @@ public class VenueController {
             resp.sendRedirect(req.getContextPath() + "/court-owner/detail?id=" + id);
         }
     }
+
     @WebServlet("/court-owner/court")
     public static class CourtServlet extends HttpServlet {
         @Override
@@ -114,7 +117,7 @@ public class VenueController {
                 req.getSession().setAttribute("warning", "Sân không tồn tại");
             } else {
                 Court check = new CourtDao().findByName(name, venueId);
-                if (check != null){
+                if (check != null) {
                     req.getSession().setAttribute("warning", "Số sân đã tồn tại.");
                 } else {
                     Court court = new Court();
@@ -122,6 +125,7 @@ public class VenueController {
                     court.setPricePerHour(pricePerHour);
                     court.setVenue(venue);
                     court.setAvailable(isAvailable);
+                    court.setDeleted(false);
                     new CourtDao().save(court);
                     req.getSession().setAttribute("success", "Thêm sân thành công.");
                 }
@@ -129,6 +133,7 @@ public class VenueController {
             resp.sendRedirect(req.getContextPath() + "/court-owner/detail?id=" + venueId);
         }
     }
+
     @WebServlet("/venue-detail")
     public static class ViewVenueDetailServlet extends HttpServlet {
         @Override
@@ -165,6 +170,7 @@ public class VenueController {
             req.getRequestDispatcher("/views/public/venue-detail.jsp").forward(req, resp);
         }
     }
+
     @WebServlet("/search")
     public static class SearchServlet extends HttpServlet {
         @Override
@@ -183,6 +189,93 @@ public class VenueController {
             List<Venue> venues = new VenueDao().searchVenues(searchQuery, priceFrom, priceTo, openTime, closeTime);
             req.setAttribute("venues", venues);
             req.getRequestDispatcher("/views/public/search.jsp").forward(req, resp);
+        }
+    }
+
+    @WebServlet("/court-owner/delete-venue")
+    public static class DeleteVenueServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long venueId = Long.parseLong(req.getParameter("id"));
+            VenueDao venueDao = new VenueDao();
+            Venue venue = venueDao.getById(venueId);
+            if (venue != null) {
+                venue.setDeleted(true);
+                venueDao.update(venue);
+                req.getSession().setAttribute("success", "Đã xóa thành công.");
+            } else {
+                req.getSession().setAttribute("warning", "Không tìm thấy sân.");
+            }
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+
+    /*@WebServlet("/court-owner/update-venue")
+    @MultipartConfig
+    public static class UpdateVenueServlet extends HttpServlet {
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long id = Long.parseLong(req.getParameter("id"));
+            VenueDao venueDao = new VenueDao();
+            Venue venue = venueDao.getById(id);
+            if (venue != null) {
+                String name = req.getParameter("name");
+                String address = req.getParameter("address");
+                LocalTime openTime = LocalTime.parse(req.getParameter("openTime"));
+                LocalTime closeTime = LocalTime.parse(req.getParameter("closeTime"));
+                venue.setName(name);
+                venue.setNormalizedName(Util.removeAccents(name));
+                venue.setAddress(address);
+                venue.setNormalizedAddress(Util.removeAccents(address));
+                venue.setOpenTime(openTime);
+                venue.setCloseTime(closeTime);
+                if (req.getPart("image") != null) {
+                    String newFileName = UploadImage.saveImage(req, "image");
+                    venue.setImage(newFileName);
+                }
+                venueDao.update(venue);
+                req.getSession().setAttribute("success", "Cập nhật thành công.");
+            } else {
+                req.getSession().setAttribute("warning", "Id không tồn tại.");
+            }
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }*/
+
+    @WebServlet("/court-owner/delete-court")
+    public static class DeleteCourtServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long courtId = Long.parseLong(req.getParameter("deleteCourtId"));
+            CourtDao courtDao = new CourtDao();
+            Court court = courtDao.getById(courtId);
+            if (court != null) {
+                court.setDeleted(true);
+                courtDao.update(court);
+                req.getSession().setAttribute("success", "Đã xóa thành công.");
+            } else {
+                req.getSession().setAttribute("warning", "Không tìm thấy sân.");
+            }
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+
+    @WebServlet("/court-owner/update-court")
+    public static class UpdateCourtServlet extends HttpServlet {
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long courtId = Long.parseLong(req.getParameter("updateCourtId"));
+            CourtDao courtDao = new CourtDao();
+            Court court = courtDao.getById(courtId);
+            if (court != null) {
+                court.setName(req.getParameter("name"));
+                court.setPricePerHour(Double.parseDouble(req.getParameter("pricePerHour")));
+                new CourtDao().update(court);
+                req.getSession().setAttribute("success", "Cập nhật thành công.");
+            } else {
+                req.getSession().setAttribute("warning", "Không tìm thấy sân.");
+            }
+            resp.sendRedirect(req.getHeader("referer"));
         }
     }
 }

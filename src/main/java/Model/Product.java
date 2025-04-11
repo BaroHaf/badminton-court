@@ -17,4 +17,5 @@ public class Product extends DistributedEntity{
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+    private boolean deleted;
 }

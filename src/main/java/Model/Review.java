@@ -10,9 +10,9 @@ import lombok.*;
 @ToString
 @Entity
 @Table(name = "reviews")
-public class Review extends DistributedEntity{
+public class Review extends DistributedEntity {
     @OneToOne
-    @JoinColumn(name = "booking_id")
+    @JoinColumn(name = "booking_id", nullable = false, unique = true)
     private Booking booking;
     private int rate;
     private String comment;

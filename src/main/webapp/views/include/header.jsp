@@ -44,78 +44,8 @@
                     </div>
                 </li>
             <% } else {%>
-                <li class="nav-item dropdown">
-
-                <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-                    <i class="bi bi-bell"></i>
-                    <span class="badge bg-primary badge-number"><%=user.getBookings().size()%></span>
-                </a><!-- End Notification Icon -->
-                <% List<Booking> pendingBookings = new BookingDao().getPendingBookingsByUserId(user.getId()); %>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-                    <li class="dropdown-header">
-                        Bạn có <%= pendingBookings.size() %> bookings chưa thanh toán
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li class="notification-item">
-                        <div>
-                            <h4>Lorem Ipsum</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>30 min. ago</p>
-                        </div>
-                    </li>
-
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li class="notification-item">
-                        <div>
-                            <h4>Atque rerum nesciunt</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>1 hr. ago</p>
-                        </div>
-                    </li>
-
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li class="notification-item">
-                        <div>
-                            <h4>Sit rerum fuga</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>2 hrs. ago</p>
-                        </div>
-                    </li>
-
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li class="notification-item">
-                        <div>
-                            <h4>Dicta reprehenderit</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>4 hrs. ago</p>
-                        </div>
-                    </li>
-
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="dropdown-footer">
-                        <a href="<%=request.getContextPath()%>/customer/bookings"><span class="badge rounded-pill bg-primary p-2 ms-2">Xem tất cả</span></a>
-                    </li>
-
-                </ul>
-                    <!-- End Notification Dropdown Items -->
-
-            </li>
                 <img src="<%=request.getContextPath()%>/<%=user.getAvatar()%>" style="width: 40px;height: 40px;object-fit: cover" alt="Profile" class="rounded-circle">
-                <span class="d-none d-md-block ps-2" style="margin-right: 10px"><%=user.getUsername()%> (<%=user.getRank()%>)</span>
+                <span class="d-none d-md-block ps-2" style="margin-right: 10px"><%=user.getUsername()%> <%= user.getRole() == Role.CUSTOMER ? "(" + user.getRank() + ")" : "" %></span>
                 <a href="<%=request.getContextPath()%>/logout" style="margin-right: 10px">
                     <button style="width: 100%; " class="btn btn-outline-success">Đăng xuất</button>
                 </a>

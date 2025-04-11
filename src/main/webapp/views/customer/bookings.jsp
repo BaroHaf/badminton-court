@@ -53,16 +53,11 @@
                 <h5 class="card-title">Danh sách booking của bạn</h5>
                 <!-- Pills Tabs -->
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
-                                data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
-                                aria-selected="true">Chưa thanh toán
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                        <button class="nav-link active" id="pills-profile-tab" data-bs-toggle="pill"
                                 data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
-                                aria-selected="false" tabindex="-1">Đã thanh toán
+                                aria-selected="true" tabindex="-1">Đã thanh toán
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -73,56 +68,7 @@
                     </li>
                 </ul>
                 <div class="tab-content pt-2" id="myTabContent">
-                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="home-tab">
-                        <form action="<%=request.getContextPath()%>/customer/payment" method="post"
-                              onsubmit="checkEmptyForm(event)">
-                            <input type="hidden" name="ids" id="ids">
-                            <label for="voucherCode">Nhập mã giảm giá (nếu có)</label>
-                            <input id="voucherCode" name="voucherCode" type="text" class="form-control w-25">
-                            <button id="payment_btn" class="btn btn-success m-1">Thanh toán</button>
-                        </form>
-                        <table class="table table-striped table-bordered">
-                            <thead class="table-dark">
-                            <tr>
-                                <th>#</th>
-                                <th>Sân</th>
-                                <th>Thời gian</th>
-                                <th>Thao tác</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <% int index = 1; %>
-                            <% for (Booking booking : bookings) { %>
-                            <% if (booking.getStatus() == BookingStatus.PENDING) { %>
-                            <tr>
-                                <td><%= index++ %>
-                                </td>
-                                <td><%= booking.getCourt().getName() %>, <%=booking.getCourt().getVenue().getName()%>
-                                </td>
-                                <td><%= booking.getStartTime() %> - <%= booking.getEndTime() %>
-                                    (<%=Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime())%>)
-                                </td>
-                                <td class="col-2">
-                                    <button id="add2payment_<%=booking.getId()%>"
-                                            onclick="add2Form(<%=booking.getId()%>, <%=booking.getCourt().getPricePerHour() * Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime())%>); this.hidden = true; document.getElementById('removeFromPayment_<%=booking.getId()%>').removeAttribute('hidden')"
-                                            type="button" class="btn btn-success w-100 m-1">Thêm vào thanh toán
-                                    </button>
-                                    <button hidden id="removeFromPayment_<%=booking.getId()%>"
-                                            onclick="removeFromForm(<%=booking.getId()%>, <%=booking.getCourt().getPricePerHour() * Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime())%>); this.hidden = true; document.getElementById('add2payment_<%=booking.getId()%>').removeAttribute('hidden')"
-                                            type="button" class="btn btn-warning w-100 m-1">Loại khỏi thanh toán
-                                    </button>
-                                    <a href="<%=request.getContextPath()%>/customer/cancel-booking?booking_id=<%=booking.getId()%>">
-                                        <button type="button" class="btn btn-success w-100 m-1">Hủy</button>
-                                    </a>
-                                </td>
-                            </tr>
-                            <% } %>
-                            <% } %>
-                            </tbody>
-                        </table>
-
-                    </div>
-                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labelledby="profile-tab">
                         <table class="table table-striped table-bordered">
                         <thead class="table-dark">
                         <tr>
@@ -133,7 +79,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <% index = 1; %>
+                        <% int index = 1; %>
                         <% for (Booking booking : bookings) { %>
                         <% if (booking.getStatus() == BookingStatus.CONFIRMED) { %>
                         <tr>
@@ -141,13 +87,20 @@
                             </td>
                             <td><%= booking.getCourt().getName() %>, <%=booking.getCourt().getVenue().getName()%>
                             </td>
-                            <td><%= booking.getStartTime() %> - <%= booking.getEndTime() %>
-                                (<%=Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime())%>)
+                            <td><%= Util.formatLocalDateTime(booking.getStartTime()) %> - <%= Util.formatLocalDateTime(booking.getEndTime()) %>
+                                (<%=Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime())%> giờ)
                             </td>
                             <td>
-                                <button onclick="$('#booking_id').val(<%=booking.getId()%>)" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addReviewModal">
-                                    Viết đánh giá
-                                </button>
+                                <% if (booking.getReview() == null){%>
+                                    <button onclick="$('#booking_id').val(<%=booking.getId()%>)" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                                        Viết đánh giá
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-success w-100" disabled>
+                                        Đã đánh giá
+                                    </button>
+                                <% } %>
+
                             </td>
                         </tr>
                         <% } %>
@@ -167,14 +120,14 @@
                             <tbody>
                             <% index = 1; %>
                             <% for (Booking booking : bookings) { %>
-                            <% if (booking.getStatus() == BookingStatus.CANCELLED) { %>
+                            <% if (booking.getStatus() != BookingStatus.CONFIRMED) { %>
                             <tr>
                                 <td><%= index++ %>
                                 </td>
                                 <td><%= booking.getCourt().getName() %>, <%=booking.getCourt().getVenue().getName()%>
                                 </td>
-                                <td><%= booking.getStartTime() %> - <%= booking.getEndTime() %>
-                                    (<%=Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime())%>)
+                                <td><%= Util.formatLocalDateTime(booking.getStartTime()) %> - <%= Util.formatLocalDateTime(booking.getEndTime()) %>
+                                    (<%=Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime())%> giờ)
                                 </td>
                             </tr>
                             <% } %>

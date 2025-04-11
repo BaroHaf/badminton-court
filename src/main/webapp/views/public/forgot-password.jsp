@@ -34,7 +34,6 @@
                                 </div>
 
                                 <form class="row g-3 needs-validation" action="<%=request.getContextPath()%>/forgot-password" method="post" novalidate>
-
                                     <div class="col-12">
                                         <label for="email" class="form-label">Email</label>
                                         <div class="input-group has-validation">

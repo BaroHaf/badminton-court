@@ -1,5 +1,6 @@
 package Model;
 
+import Util.Util;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,8 +18,12 @@ public class Venue extends DistributedEntity {
     @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
     private String name;
 
+    private String normalizedName;
+
     @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
     private String address;
+
+    private String normalizedAddress;
 
     private String image;
     private LocalTime openTime;
@@ -30,9 +35,13 @@ public class Venue extends DistributedEntity {
     @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL)
     private List<Court> courts;
 
+    private boolean deleted;
+
     public Venue(String name, String address, String image, LocalTime openTime, LocalTime closeTime, User user) {
         this.name = name;
+        this.normalizedName = Util.removeAccents(name);
         this.address = address;
+        this.normalizedAddress = Util.removeAccents(address);
         this.image = image;
         this.openTime = openTime;
         this.closeTime = closeTime;

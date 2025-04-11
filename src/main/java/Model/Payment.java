@@ -16,8 +16,9 @@ import java.util.List;
 @ToString
 public class Payment extends DistributedEntity{
 
-    @OneToMany(mappedBy = "payment")
-    private List<Booking> bookings;
+    @OneToOne
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
     private long amount;
     public String txnRef;
     public String orderInfo;

@@ -35,7 +35,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Giá</label>
-                                <input type="number" step="0.01" class="form-control" name="price" required>
+                                <input type="number" step="0.01" class="form-control" name="price" min="0" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Thêm</button>
                         </form>

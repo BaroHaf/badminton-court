@@ -4,6 +4,7 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.DayOfWeek" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="Util.Util" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% Venue venue = (Venue) request.getAttribute("venue");%>
 <!DOCTYPE html>
@@ -71,39 +72,58 @@
                     <div class="col-12">
                         <label for="court_id" class="form-label">Chọn sân</label>
                         <div class="input-group has-validation">
-                            <select class="form-control" name="court_id" id="court_id">
+                            <select onchange="test(this)" class="form-control" name="court_id" id="court_id">
+                                <option selected disabled>Vui lòng chọn sân</option>
                                 <% for (int i = 0; i < venue.getCourts().size(); i++) { %>
-                                <% if (venue.getCourts().get(i).isAvailable()) {%>
-                                <option selected value="<%=venue.getCourts().get(i).getId()%>">Sân
-                                    số <%=venue.getCourts().get(i).getName()%>
-                                </option>
-                                <%}%>
+                                    <% if (venue.getCourts().get(i).isAvailable() && !venue.isDeleted()) {%>
+                                        <option data-price="<%=venue.getCourts().get(i).getPricePerHour()%>" value="<%=venue.getCourts().get(i).getId()%>">Sân
+                                            số <%=venue.getCourts().get(i).getName()%>
+                                        </option>
+                                    <%}%>
                                 <% } %>
                             </select>
                         </div>
+                    </div>
 
-                        <div class="col-12">
-                            <label for="start_time" class="form-label">Bắt đầu thuê lúc</label>
-                            <div class="input-group has-validation">
-                                <input onchange="$('#end_time').val(this.value)" type="datetime-local" name="start_time"
-                                       class="form-control" id="start_time" required>
-                            </div>
+                    <div class="col-12 row">
+                        <div class="col-6">
+                            <label for="court_price">Giá 1 giờ</label>
+                            <input class="form-control" type="text" name="court_price" id="court_price" disabled >
                         </div>
-
-                        <div class="col-12">
-                            <label for="end_time" class="form-label">Kết thúc thuê lúc</label>
-                            <div class="input-group has-validation">
-                                <input type="datetime-local" name="end_time" class="form-control" id="end_time"
-                                       required>
-                            </div>
+                        <div class="col-6">
+                            <label for="temp_price">Tạm tính</label>
+                            <input class="form-control" type="text" name="temp_price" id="temp_price" disabled >
                         </div>
+                    </div>
 
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-success w-100 m-1">
+                    <div class="col-12">
+                        <label for="start_time" class="form-label">Bắt đầu thuê lúc</label>
+                        <div class="input-group has-validation">
+                            <input onchange="$('#end_time').val(this.value); chooseStartTime(this)" type="datetime-local" name="start_time"
+                                   class="form-control" id="start_time" required>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="end_time" class="form-label">Kết thúc thuê lúc</label>
+                        <div class="input-group has-validation">
+                            <input onchange="chooseEndTime(this)" type="datetime-local" name="end_time" class="form-control" id="end_time"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="voucherCode" class="form-label">Mã giảm giá (nếu có)</label>
+                        <div class="input-group has-validation">
+                            <input type="text" name="voucherCode" class="form-control" id="voucherCode">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                            <button disabled id="submit_button" type="submit" class="btn btn-success w-100 m-1">
                                 Đặt sân ngay
                             </button>
                         </div>
-                    </div>
                 </form>
             </div>
         </div>
@@ -162,7 +182,7 @@
             </form>
             <% List<Booking> bookings = (List<Booking>) request.getAttribute("bookings");%>
             <% for (int i = 0; i < bookings.size(); i++) { %>
-                <p>Sân <%=bookings.get(i).getCourt().getName()%>, từ <%=bookings.get(i).getStartTime()%> đến <%=bookings.get(i).getEndTime()%></p>
+                <p>Sân <%=bookings.get(i).getCourt().getName()%>, từ <%=Util.formatLocalDateTime(bookings.get(i).getStartTime())%> đến <%=Util.formatLocalDateTime(bookings.get(i).getEndTime())%></p>
             <% } %>
         </div>
     </section>
@@ -212,7 +232,59 @@
         showBookings()
     }
 </script>
+<script>
+    let court_id = 0;
+    let court_price = 0;
+    let startTime = null;
+    let endTime = null;
+    function test(selector) {
+        court_id = parseInt(selector.value)
+        const selectedOption = selector.options[selector.selectedIndex];
+        court_price = parseInt(selectedOption.getAttribute('data-price'))
+        changeForm()
+    }
+    function changeForm() {
+        if (court_id !== 0 && court_price !== 0){
+            $("#court_price").val(court_price)
+        }
+    }
+    function isStep30Minutes(start, end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const diffInMs = endDate - startDate;
+        const diffInMinutes = diffInMs / (1000 * 60);
 
+        return diffInMinutes % 30 === 0;
+    }
+    function getDecimalHours(start, end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const diffInMs = endDate - startDate;
+        return diffInMs / (1000 * 60 * 60);
+    }
+    function isStartBeforeEnd(start, end) {
+        return new Date(start) < new Date(end);
+    }
+    function chooseStartTime(input) {
+        startTime = new Date(input.value);
+    }
+    function chooseEndTime(input) {
+        endTime = new Date(input.value);
+        if (!isStartBeforeEnd(startTime, endTime)) {
+            toastr.warning("Giờ bắt đầu phải trước giờ kết thúc")
+            $("#submit_button").prop('disabled', true);
+        } else if (!isStep30Minutes(startTime, endTime)){
+            toastr.warning("Khoảng cách giữa giờ bắt đầu và kết thúc cách nhau bội số 30p")
+            $("#submit_button").prop('disabled', true);
+        } else {
+            $("#temp_price").val(getDecimalHours(startTime, endTime) * court_price);
+            $("#submit_button").removeAttr('disabled');
+        }
+    }
+    function checkTime() {
+
+    }
+</script>
 </body>
 
 </html>

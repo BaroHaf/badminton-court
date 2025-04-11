@@ -29,23 +29,19 @@ import java.util.*;
 public class PaymentController {
     @WebServlet("/customer/payment")
     public static class PaymentServlet extends HttpServlet {
-        public static long getAmount(List<Booking> bookings){
-            long amount = 0;
-            for (int i = 0; i < bookings.size(); i++) {
-                amount += (long) (bookings.get(i).getCourt().getPricePerHour() * Util.calculateHourDifference(bookings.get(i).getStartTime(), bookings.get(i).getEndTime()));
-            }
-            return amount;
+        public static long getAmount(Booking booking){
+            return (long) (booking.getCourt().getPricePerHour() * Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime()));
         }
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            long[] ids = Arrays.stream(req.getParameter("ids").split(",")).mapToLong(Long::parseLong).toArray();
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long id = Long.parseLong(req.getParameter("id"));
             User user = (User) req.getSession().getAttribute("user");
-            List<Booking> bookings = new BookingDao().getBookingsIn(ids);
+            Booking booking = new BookingDao().getById(id);
             String voucherCode = req.getParameter("voucherCode");
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
             String orderType = "other";
-            long amount = getAmount(bookings) * 100L;
+            long amount = getAmount(booking) * 100L;
             boolean check = true;
             Voucher voucher = null;
             if (!voucherCode.isEmpty()){
@@ -75,7 +71,7 @@ public class PaymentController {
                     vnp_Params.put("vnp_BankCode", bankCode);
                 }
                 vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-                String vnp_OrderInfo = UUID.randomUUID() + "-" + System.currentTimeMillis() + "|" + req.getParameter("ids");
+                String vnp_OrderInfo = UUID.randomUUID() + "-" + System.currentTimeMillis() + "|" + req.getParameter("id");
                 vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
                 vnp_Params.put("vnp_OrderType", orderType);
                 String locate = req.getParameter("language");
@@ -124,7 +120,7 @@ public class PaymentController {
                 if (voucher != null) {
                     payment.setVoucherCode(voucher.getCode());
                     payment.setVoucherDiscount(voucher.getDiscount());
-                    payment.setDiscountAmount(getAmount(bookings)  - amount / 100);
+                    payment.setDiscountAmount(getAmount(booking)  - amount / 100);
                 }
                 new PaymentDao().save(payment);
                 String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
@@ -172,17 +168,18 @@ public class PaymentController {
                         payment.setTransactionStatus(TransactionStatus.fromCode(vnp_TransactionStatus));
                         payment.setCardType(vnp_CardType);
                         payment.setBankTranNo(vnp_BankTranNo);
-                        long[] booking_ids = Arrays.stream(vnp_OrderInfo.split("\\|")[1].split(",")).mapToLong(Long::parseLong).toArray();
-                        List<Booking> bookings = bookingDao.getBookingsIn(booking_ids);
+                        long booking_id = Long.parseLong(vnp_OrderInfo.split("\\|")[1]);
+                        Booking booking = bookingDao.getById(booking_id);
                         if (payment.transactionStatus == TransactionStatus.SUCCESS){
-                            for (Booking booking : bookings) {
-                                booking.setStatus(BookingStatus.CONFIRMED);
-                                booking.setPayment(payment);
-                                booking.setAmount(booking.getCourt().getPricePerHour() * Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime()));
-                            }
-                            bookingDao.updateAll(bookings);
-                            payment.setBookings(bookings);
+                            booking.setStatus(BookingStatus.CONFIRMED);
+                            booking.setAmount(booking.getCourt().getPricePerHour() * Util.calculateHourDifference(booking.getStartTime(), booking.getEndTime()));
+
+                        } else {
+                            booking.setStatus(BookingStatus.CANCELLED);
                         }
+                        booking.setPayment(payment);
+                        bookingDao.update(booking);
+                        payment.setBooking(booking);
                         try {
                             payment.setPaid_at(Timestamp.valueOf(sqlFormatter.format(formatter.parse(paid_at))));
                         } catch (ParseException e) {

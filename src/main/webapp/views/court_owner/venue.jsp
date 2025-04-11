@@ -40,7 +40,7 @@
 
   <section class="section dashboard">
     <div class="row">
-      <div class="col-5">
+      <div class="col-4">
         <form action="<%=request.getContextPath()%>/court-owner" method="post" enctype="multipart/form-data">
 
           <div class="col-12">
@@ -89,7 +89,7 @@
 
         </form>
       </div>
-      <div class="col-7">
+      <div class="col-8">
         <h2 class="text-center mb-4">Danh sách sân cầu</h2>
         <table class="table table-striped table-bordered">
           <thead class="table-dark">
@@ -109,7 +109,8 @@
               int index = 1;
               for (Venue venue : venues) {
           %>
-          <tr>
+          <% if (!venue.isDeleted()) {%>
+            <tr>
             <td><%= index++ %></td>
             <td><%= venue.getName() %></td>
             <td><%= venue.getAddress() %></td>
@@ -122,10 +123,19 @@
             </td>
             <td><%= venue.getOpenTime() != null ? venue.getOpenTime().format(timeFormatter) : "N/A" %></td>
             <td><%= venue.getCloseTime() != null ? venue.getCloseTime().format(timeFormatter) : "N/A" %></td>
-            <td>
-              <a href="<%=request.getContextPath()%>/court-owner/detail?id=<%= venue.getId() %>" class="btn btn-primary btn-sm w-100">Chi tiết</a>
+            <td class="col-2">
+              <a href="<%=request.getContextPath()%>/court-owner/detail?id=<%= venue.getId() %>" class="btn btn-primary btn-sm w-100 m-1">Chi tiết</a>
+              <button
+                      class="btn btn-warning btn-sm w-100 m-1"
+                      data-bs-toggle="modal"
+                      data-bs-target="#updateVenueModal"
+                      onclick="changeDeleteVenueModalForm(<%= venue.getId() %>)"
+              >
+                Xóa
+              </button>
             </td>
           </tr>
+          <% }%>
           <%
             }
           } else {
@@ -138,6 +148,27 @@
           %>
           </tbody>
         </table>
+        <div class="modal fade" id="updateVenueModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <form action="<%=request.getContextPath()%>/court-owner/delete-venue" method="get">
+                <div class="modal-header">
+                  <h5 class="modal-title">Xóa nhật sân</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" name="id" id="updateVenueId" />
+
+                  Bạn có chắc muốn xóa sân này không?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                  <button type="submit" class="btn btn-primary">Xóa</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -153,5 +184,11 @@
 
 <%@include file="../include/js.jsp"%>
 </body>
+<script>
+  function changeDeleteVenueModalForm(id) {
+    document.getElementById("updateVenueId").value = id;
+  }
+</script>
+
 
 </html>

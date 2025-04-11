@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class SaleRecordController {
@@ -20,10 +22,15 @@ public class SaleRecordController {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             User user = (User) req.getSession().getAttribute("user");
-            List<SaleRecord> saleRecords = new SaleRecordDao().findAllByUserId(user.getId());
-            List<Product> products = new ProductDao().findAllByUserId(user.getId());
+            LocalDate today = LocalDate.now();
+            LocalDateTime startOfDay = today.atStartOfDay();
+            LocalDateTime endOfDay = today.atTime(23, 59, 59);
+            List<SaleRecord> saleRecords = new SaleRecordDao().getSalesBetween(user.getId(), startOfDay, endOfDay);
+            List<Product> products = new ProductDao().findAllByUserIdAndDeletedFalse(user.getId());
             req.setAttribute("products", products);
             req.setAttribute("saleRecords", saleRecords);
+            req.setAttribute("startOfDay", startOfDay);
+            req.setAttribute("endOfDay", endOfDay);
             req.getRequestDispatcher("/views/court_owner/sale-record.jsp").forward(req, resp);
         }
 

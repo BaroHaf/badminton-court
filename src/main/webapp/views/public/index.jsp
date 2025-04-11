@@ -40,24 +40,26 @@
 
             <h2 class="text-center mb-4">Danh Sách Cơ Sở Cầu Lông</h2>
             <% for (int i = 0; i < venues.size(); i++) { %>
-            <div class="col-4">
-                <div class="card h-100">
-                    <img src="<%=venues.get(i).getImage() %>" class="card-img-top" alt="Hình ảnh sân" style="width: 100%; height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title"><%= venues.get(i).getName() %>
-                        </h5>
-                        <p class="card-text"><strong>Địa chỉ:</strong> <%= venues.get(i).getAddress() %>
-                        </p>
-                        <p class="card-text">
-                            <strong>Giờ mở cửa:</strong> <%= venues.get(i).getOpenTime() %> - <%= venues.get(i).getCloseTime() %>
-                        </p>
-                        <p class="card-text">
-                            <strong>Chủ sân:</strong> <%=venues.get(i).getOwner().getUsername()%>
-                        </p>
-                        <a href="<%=request.getContextPath()%>/venue-detail?id=<%= venues.get(i).getId() %>&from=&to=" class="btn btn-primary">Xem chi tiết</a>
+                <% if (!venues.get(i).isDeleted()) {%>
+                    <div class="col-4">
+                        <div class="card h-100">
+                            <img src="<%=venues.get(i).getImage() %>" class="card-img-top" alt="Hình ảnh sân" style="width: 100%; height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= venues.get(i).getName() %>
+                                </h5>
+                                <p class="card-text"><strong>Địa chỉ:</strong> <%= venues.get(i).getAddress() %>
+                                </p>
+                                <p class="card-text">
+                                    <strong>Giờ mở cửa:</strong> <%= venues.get(i).getOpenTime() %> - <%= venues.get(i).getCloseTime() %>
+                                </p>
+                                <p class="card-text">
+                                    <strong>Chủ sân:</strong> <%=venues.get(i).getOwner().getUsername()%>
+                                </p>
+                                <a href="<%=request.getContextPath()%>/venue-detail?id=<%= venues.get(i).getId() %>&from=&to=" class="btn btn-primary">Xem chi tiết</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                <% } %>
             <% } %>
 
         </div>

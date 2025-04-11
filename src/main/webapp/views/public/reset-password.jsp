@@ -34,11 +34,12 @@
                                 </div>
 
                                 <form class="row g-3 needs-validation" action="<%=request.getContextPath()%>/reset-password" method="post" novalidate>
+                                    <input type="hidden" name="token" value="<%=request.getParameter("token")%>">
 
                                     <div class="col-12">
                                         <label for="email" class="form-label">Mật khẩu</label>
                                         <div class="input-group has-validation">
-                                            <input type="password" name="email" class="form-control" id="email" required>
+                                            <input type="password" name="password" class="form-control" id="email" required>
                                         </div>
                                     </div>
 

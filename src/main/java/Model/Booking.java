@@ -24,6 +24,9 @@ public class Booking extends DistributedEntity {
     @JoinColumn(name = "court_id")
     private Court court;
 
+    private String courtName;
+    private String venueName;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
@@ -35,4 +38,7 @@ public class Booking extends DistributedEntity {
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;
+
+    @OneToOne(mappedBy = "booking", fetch = FetchType.EAGER)
+    private Review review;
 }

@@ -273,7 +273,20 @@ public class UserController {
             if (user != null) {
                 String uuid = UUID.randomUUID().toString();
                 user.setToken(uuid);
-                new UserDao().save(user);
+                new UserDao().update(user);
+                // send mail
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.submit(() -> {
+                    try {
+                        String url = Config.app_url + req.getContextPath() + "/reset-password?token=" + uuid;
+                        String html = "Vui lòng nhấn vào <a href='url'>đây</a> để lấy lại mật khẩu của bạn.".replace("url", url);
+                        Mail.send(email, "Lấy lại mật khẩu", html);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
+                executorService.shutdown();
+                // end send mail
             }
             req.getSession().setAttribute("success", "Vui lòng kiểm tra email");
             resp.sendRedirect(req.getHeader("referer"));

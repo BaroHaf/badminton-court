@@ -48,6 +48,8 @@ public class BookingController {
                 req.getSession().setAttribute("warning", "Thời gian bắt đầu và kết thúc phải trong cùng một ngày!");
             } else if (!isStep30Minutes(start_time, end_time)){
                 req.getSession().setAttribute("warning", "Khoảng cách giữa giờ bắt đầu và kết thúc cách nhau bội số 30p!");
+            } else if (start_time.isBefore(LocalDateTime.now())){
+                req.getSession().setAttribute("warning", "Giờ bắt đầu phải sau thời điểm hiện tại.");
             } else {
                 booking.setUser(user);
                 booking.setCourt(court);

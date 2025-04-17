@@ -264,6 +264,11 @@
         $("#updateEmail").val(email);
         $("#updateUsername").val(username);
         $("#updatePhone").val(phone);
+        if (verified === 'true'){
+            $("#updateVerified").prop('disabled', true);
+        } else {
+            $("#updateVerified").prop('disabled', false);
+        }
         $("#updateVerified").val(verified);
         $("#updateBlocked").val(blocked);
         $("#updateRole").val(role);

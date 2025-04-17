@@ -25,6 +25,7 @@ public class Booking extends DistributedEntity {
     private Court court;
 
     private String courtName;
+    @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
     private String venueName;
 
     private LocalDateTime startTime;

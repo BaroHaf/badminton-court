@@ -64,16 +64,6 @@
                                     </div>
 
                                     <div class="col-12">
-                                        <label for="role" class="form-label">Đăng kí với tư cách</label>
-                                        <div class="input-group has-validation">
-                                            <select class="form-control" name="role" id="role">
-                                                <option selected value="CUSTOMER">Khách hàng</option>
-                                                <option value="COURT_OWNER">Chủ sân</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
                                         <button class="btn btn-primary w-100" type="submit">Đăng kí</button>
                                     </div>
                                     <div class="col-12">

@@ -12,4 +12,9 @@ public class PaymentDao extends GenericDao<Payment>{
         query.setParameter("orderInfo", orderInfo);
         return query.getSingleResult();
     }
+    public long getAmountPaidByUserId(long userId){
+        TypedQuery<Long> query = entityManager.createQuery("select sum(p.amount) from Payment p where p.booking.user.id = :userId and p.transactionStatus = 'SUCCESS'", Long.class);
+        query.setParameter("userId", userId);
+        return query.getSingleResult();
+    }
 }

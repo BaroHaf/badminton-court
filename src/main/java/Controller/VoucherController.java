@@ -28,9 +28,13 @@ public class VoucherController {
             int discount = Integer.parseInt(req.getParameter("discount"));
             LocalDate startDate = LocalDate.parse(req.getParameter("startDate"));
             LocalDate endDate = LocalDate.parse(req.getParameter("endDate"));
-            Rank forRank = Rank.valueOf(req.getParameter("forRank"));
-            Voucher voucher = new Voucher(code, type, discount, startDate, endDate, false, forRank);
-            new VoucherDao().save(voucher);
+            if (endDate.isBefore(startDate)){
+                req.getSession().setAttribute("warning", "Ngày kết thúc phải sau ngày bắt đầu");
+            } else {
+                Rank forRank = Rank.valueOf(req.getParameter("forRank"));
+                Voucher voucher = new Voucher(code, type, discount, startDate, endDate, false, forRank);
+                new VoucherDao().save(voucher);
+            }
             resp.sendRedirect(req.getContextPath() + "/admin/voucher");
         }
     }

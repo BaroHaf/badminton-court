@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 
 public class Util {
 
+    public static String passwordRegex = "^(?=.*[^a-zA-Z0-9]).{8,}$";
+    public static String usernameRegex = "^[a-zA-Z]+$";
+
     public static class LocalTimeAdapter implements JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
         private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -53,5 +56,11 @@ public class Util {
         String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(normalized).replaceAll("").toLowerCase();
+    }
+    public static boolean isPasswordValid(String password){
+        return password.matches(passwordRegex);
+    }
+    public static boolean isUsernameValid(String username){
+        return username.matches(usernameRegex);
     }
 }

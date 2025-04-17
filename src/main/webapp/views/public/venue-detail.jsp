@@ -97,6 +97,13 @@
                     </div>
 
                     <div class="col-12">
+                        <label for="voucherCode" class="form-label">Mã giảm giá (nếu có)</label>
+                        <div class="input-group has-validation">
+                            <input type="text" name="voucherCode" class="form-control" id="voucherCode">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
                         <label for="start_time" class="form-label">Bắt đầu thuê lúc</label>
                         <div class="input-group has-validation">
                             <input onchange="$('#end_time').val(this.value); chooseStartTime(this)" type="datetime-local" name="start_time"
@@ -109,13 +116,6 @@
                         <div class="input-group has-validation">
                             <input onchange="chooseEndTime(this)" type="datetime-local" name="end_time" class="form-control" id="end_time"
                                    required>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <label for="voucherCode" class="form-label">Mã giảm giá (nếu có)</label>
-                        <div class="input-group has-validation">
-                            <input type="text" name="voucherCode" class="form-control" id="voucherCode">
                         </div>
                     </div>
 
@@ -277,12 +277,18 @@
             toastr.warning("Khoảng cách giữa giờ bắt đầu và kết thúc cách nhau bội số 30p")
             $("#submit_button").prop('disabled', true);
         } else {
-            $("#temp_price").val(getDecimalHours(startTime, endTime) * court_price);
+            getTempPrice();
             $("#submit_button").removeAttr('disabled');
         }
     }
-    function checkTime() {
-
+    function getTempPrice() {
+        const url = "<%=Config.app_url + request.getContextPath()%>/api/calculate-price-with-voucher?courtId=" + court_id + "&hours=" + getDecimalHours(startTime, endTime) + "&voucherCode=" + $("#voucherCode").val();
+        fetch(url)
+            .then(response => response.json())
+            .then(data => $("#temp_price").val(data))
+            .catch(err => {
+                console.log(err)
+            })
     }
 </script>
 </body>

@@ -42,7 +42,7 @@
             <img src="<%=request.getContextPath()%>/<%=user.getAvatar()%>" alt="User avatar" style="width:100%; height: 500px; object-fit: contain;">
             <form action="<%=request.getContextPath()%>/user/avatar" method="post" enctype="multipart/form-data">
               <label for="avatar">Thay đổi ảnh đại diện</label>
-              <input type="file" name="avatar" id="avatar" accept="image/*">
+              <input type="file" name="avatar" id="avatar" accept="image/*" required>
               <button class="btn btn-success w-100">Cập nhật</button>
             </form>
           </div>
@@ -70,7 +70,13 @@
               </div>
 
               <div class="col-12">
-                <label for="yourPassword" class="form-label">Password</label>
+                <label for="oldPassword" class="form-label">Mât khẩu cũ</label>
+                <input type="password" name="oldPassword" class="form-control" id="oldPassword" value="">
+                <div class="invalid-feedback">Vui lòng nhập mật khẩu!</div>
+              </div>
+
+              <div class="col-12">
+                <label for="yourPassword" class="form-label">Mật khẩu mới</label>
                 <input type="password" name="password" class="form-control" id="yourPassword" value="">
                 <div class="invalid-feedback">Vui lòng nhập mật khẩu!</div>
               </div>

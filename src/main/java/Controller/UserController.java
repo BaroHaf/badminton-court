@@ -7,6 +7,7 @@ import Model.User;
 import Util.Config;
 import Util.Mail;
 import Util.UploadImage;
+import Util.Util;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -77,13 +78,16 @@ public class UserController {
             } else if (new UserDao().findByUsername(username) != null) {
                 req.getSession().setAttribute("warning", "Username đang được sử dụng.");
                 resp.sendRedirect(req.getContextPath() + "/register");
+            } else if (!Util.isPasswordValid(password)){
+                req.getSession().setAttribute("warning", "Mật khẩu phải có tối thiểu 8 kí tự và 1 kí tự đặc biệt.");
+                resp.sendRedirect(req.getContextPath() + "/register");
+            } else if (!Util.isUsernameValid(username)){
+                req.getSession().setAttribute("warning", "Username không được chứa kí tự đặc biệt hoặc số.");
+                resp.sendRedirect(req.getContextPath() + "/register");
             } else {
                 String token = UUID.randomUUID().toString() + System.currentTimeMillis();
                 password = BCrypt.hashpw(password, BCrypt.gensalt());
-                Role role = Role.valueOf(req.getParameter("role"));
-                if (role == Role.ADMIN) {
-                    role = Role.CUSTOMER;
-                }
+                Role role = Role.CUSTOMER;
                 User user = new User(email, username, password, phone, role, "uploads/default-avatar.png", false, false, token, Rank.BRONZE);
                 new UserDao().save(user);
                 // send mail
@@ -184,10 +188,14 @@ public class UserController {
             String email = req.getParameter("email");
             String phone = req.getParameter("phone");
             String password = req.getParameter("password");
+            String oldPassword = req.getParameter("oldPassword");
             User user = (User) req.getSession().getAttribute("user");
+            user = new UserDao().getById(user.getId());
+            boolean check = true;
             if (!user.getUsername().equals(username)) {
                 if (new UserDao().findByUsername(username) != null) {
                     req.getSession().setAttribute("warning", "Username đã được sử dụng.");
+                    check = false;
                 } else {
                     user.setUsername(username);
                 }
@@ -195,6 +203,7 @@ public class UserController {
             if (!user.getEmail().equals(email)) {
                 if (new UserDao().findByEmail(email) != null) {
                     req.getSession().setAttribute("warning", "Email đã được sử dụng.");
+                    check = false;
                 } else {
                     user.setEmail(email);
                 }
@@ -202,16 +211,29 @@ public class UserController {
             if (!user.getPhone().equals(phone)) {
                 if (new UserDao().findByPhone(phone) != null) {
                     req.getSession().setAttribute("warning", "Số điện thoại đang được sử dụng.");
+                    check = false;
                 } else {
                     user.setPhone(phone);
                 }
             }
-            if (!password.isEmpty()) {
-                user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+            if (!oldPassword.isEmpty()){
+                if (BCrypt.checkpw(oldPassword, user.getPassword())) {
+                    if (!password.isEmpty()) {
+                        user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+                    }
+                } else {
+                    req.getSession().setAttribute("warning", "Mật khẩu cũ không khớp.");
+                    check = false;
+                }
             }
-            new UserDao().update(user);
-            req.getSession().setAttribute("success", "Cập nhật thành công.");
-            resp.sendRedirect(req.getContextPath() + "/user/profile");
+            if (check){
+                new UserDao().update(user);
+                req.getSession().setAttribute("user", user);
+                req.getSession().setAttribute("success", "Cập nhật thành công.");
+                resp.sendRedirect(req.getContextPath() + "/user/profile");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/user/profile");
+            }
         }
     }
 

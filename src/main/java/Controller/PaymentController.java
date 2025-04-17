@@ -1,14 +1,10 @@
 package Controller;
 
-import Dao.BookingDao;
-import Dao.PaymentDao;
-import Dao.VoucherDao;
-import Model.Booking;
+import Dao.*;
+import Model.*;
 import Model.Constant.BookingStatus;
+import Model.Constant.Rank;
 import Model.Constant.TransactionStatus;
-import Model.Payment;
-import Model.User;
-import Model.Voucher;
 import Util.Util;
 import Util.VNPayUtil;
 import Util.Config;
@@ -45,7 +41,7 @@ public class PaymentController {
             boolean check = true;
             Voucher voucher = null;
             if (!voucherCode.isEmpty()){
-                 voucher = new VoucherDao().findByCodeNotDisable(voucherCode);
+                 voucher = new VoucherDao().findByCodeNotDisableAndValidTime(voucherCode);
                 if (voucher != null) {
                     if (user.getRank().ordinal() < voucher.getForRank().ordinal()){
                         check = false;
@@ -188,6 +184,16 @@ public class PaymentController {
                         paymentDao.update(payment);
                         if (payment.transactionStatus == TransactionStatus.SUCCESS){
                             req.getSession().setAttribute("success", "Thanh toán thành công.");
+                            long amountUsed = new PaymentDao().getAmountPaidByUserId(payment.getBooking().getUser().getId());
+                            User user = payment.getBooking().getUser();
+                            if (amountUsed >= 500000 && amountUsed < 1000000){
+                                user.setRank(Rank.SILVER);
+                            }
+                            if (amountUsed >= 1000000){
+                                user.setRank(Rank.GOLD);
+                            }
+                            new UserDao().update(user);
+                            req.getSession().setAttribute("user", user);
                         } else {
                             req.getSession().setAttribute("warning", "Thanh toán không thành công.");
                         }
@@ -201,6 +207,23 @@ public class PaymentController {
                 req.getSession().setAttribute("warning", "Mã băm không khớp");
             }
             resp.sendRedirect(req.getContextPath() + "/customer/bookings");
+        }
+    }
+
+    @WebServlet("/api/calculate-price-with-voucher")
+    public static class CalculatePriceWithVoucher extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String voucherCode = req.getParameter("voucherCode");
+            long courtId = Long.parseLong(req.getParameter("courtId"));
+            float hours = Float.parseFloat(req.getParameter("hours"));
+            Court court = new CourtDao().getById(courtId);
+            Voucher voucher = new VoucherDao().findByCodeNotDisableAndValidTime(voucherCode);
+            long amount = (long) (hours * court.getPricePerHour());
+            if (voucher != null){
+                amount = voucher.calculateDiscount(amount);
+            }
+            resp.getWriter().print(amount);
         }
     }
 }

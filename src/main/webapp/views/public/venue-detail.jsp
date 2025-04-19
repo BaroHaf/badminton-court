@@ -68,14 +68,14 @@
                 <%
                     }
                 %>
-                <form action="<%=request.getContextPath()%>/customer/book" method="post">
+                <form onsubmit="checkForm(event)" action="<%=request.getContextPath()%>/customer/book" method="post">
                     <div class="col-12">
                         <label for="court_id" class="form-label">Chọn sân</label>
                         <div class="input-group has-validation">
                             <select onchange="test(this)" class="form-control" name="court_id" id="court_id">
                                 <option selected disabled>Vui lòng chọn sân</option>
                                 <% for (int i = 0; i < venue.getCourts().size(); i++) { %>
-                                    <% if (venue.getCourts().get(i).isAvailable() && !venue.isDeleted()) {%>
+                                    <% if (venue.getCourts().get(i).isAvailable() && !venue.isDeleted() && !venue.getCourts().get(i).isDeleted()) {%>
                                         <option data-price="<%=venue.getCourts().get(i).getPricePerHour()%>" value="<%=venue.getCourts().get(i).getId()%>">Sân
                                             số <%=venue.getCourts().get(i).getName()%>
                                         </option>
@@ -289,6 +289,20 @@
             .catch(err => {
                 console.log(err)
             })
+    }
+    function checkForm(e) {
+        if (court_id == 0){
+            toastr.warning("Vui lòng chọn 1 sân")
+            e.preventDefault()
+        }
+        if (startTime == null){
+            toastr.warning("Bạn chưa chọn giờ bắt đầu")
+            e.preventDefault()
+        }
+        if (endTime == null){
+            toastr.warning("Bạn chưa chọn giờ kết thúc")
+            e.preventDefault()
+        }
     }
 </script>
 </body>

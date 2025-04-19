@@ -14,4 +14,10 @@ public class ProductDao extends GenericDao<Product> {
         query.setParameter("userId", userId);
         return query.getResultList();
     }
+    public Product findByIdAndUserId(long id, long userId) {
+        TypedQuery<Product> query = entityManager.createQuery("select p from Product p where p.id = :id and p.owner.id = :userId", Product.class);
+        query.setParameter("id", id);
+        query.setParameter("userId", userId);
+        return query.getSingleResult();
+    }
 }

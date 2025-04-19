@@ -95,8 +95,7 @@
                             <div class="col-12">
                                 <label for="image" class="form-label">Hình ảnh</label>
                                 <div class="input-group has-validation">
-                                    <input type="file" accept="image/*" name="image" class="form-control" id="image"
-                                           required>
+                                    <input type="file" accept="image/*" name="image" class="form-control" id="image">
                                     <div class="invalid-feedback">Ảnh cho sân cầu.</div>
                                 </div>
                             </div>

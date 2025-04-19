@@ -197,7 +197,12 @@ public class UserController {
                     req.getSession().setAttribute("warning", "Username đã được sử dụng.");
                     check = false;
                 } else {
-                    user.setUsername(username);
+                    if (!Util.isUsernameValid(username)){
+                        req.getSession().setAttribute("warning", "Username không được chứa kí tự đặc biệt.");
+                        check = false;
+                    } else {
+                        user.setUsername(username);
+                    }
                 }
             }
             if (!user.getEmail().equals(email)) {
@@ -271,12 +276,17 @@ public class UserController {
     @MultipartConfig
     public static class UserAvatar extends HttpServlet {
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            String filename = UploadImage.saveImage(req, "avatar");
-            User user = (User) req.getSession().getAttribute("user");
-            user.setAvatar(filename);
-            new UserDao().update(user);
-            req.getSession().setAttribute("user", user);
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            try {
+                String filename = UploadImage.saveImage(req, "avatar");
+                User user = (User) req.getSession().getAttribute("user");
+                user.setAvatar(filename);
+                new UserDao().update(user);
+                req.getSession().setAttribute("user", user);
+            } catch (ServletException e){
+                e.printStackTrace();
+                req.getSession().setAttribute("warning", "File tải lên phải là 1 ảnh");
+            }
             resp.sendRedirect(req.getHeader("referer"));
         }
     }

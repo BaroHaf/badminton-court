@@ -62,4 +62,9 @@ public class VenueDao extends GenericDao<Venue>{
 
         return entityManager.createQuery(cq).getResultList();
     }
+    public Venue findByIdAndDeletedFalse(long id){
+        TypedQuery<Venue> query = entityManager.createQuery("select v from Venue v where v.id = :id and v.deleted = false", Venue.class);
+        query.setParameter("id", id);
+        return query.getResultStream().findFirst().orElse(null);
+    }
 }

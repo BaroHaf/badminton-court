@@ -76,7 +76,7 @@ public class VenueController {
                 String address = req.getParameter("address");
                 String openTime = req.getParameter("openTime");
                 String closeTime = req.getParameter("closeTime");
-                if (req.getPart("image") != null) {
+                if (req.getPart("image") != null && req.getPart("image").getSize() > 0) {
                     String image = UploadImage.saveImage(req, "image");
                     venue.setImage(image);
                 }
@@ -139,35 +139,40 @@ public class VenueController {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             long venueId = Long.parseLong(req.getParameter("id"));
-            String from = req.getParameter("from");
-            String to = req.getParameter("to");
-            LocalDateTime startDateTime;
-            LocalDateTime endDateTime;
-            if (from.isEmpty() && to.isEmpty()) {
-                LocalDate today = LocalDate.now();
-                LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
-                startDateTime = startOfWeek.atStartOfDay();
-                LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY);
-                endDateTime = endOfWeek.atTime(23, 59);
-            } else {
-                LocalDate startDate = LocalDate.parse(from);
-                LocalDate endDate = LocalDate.parse(to);
-                startDateTime = startDate.atStartOfDay();
-                endDateTime = endDate.atTime(23, 59);
-            }
-            List<Booking> bookings = new BookingDao().getConfirmedBookingIn(startDateTime, endDateTime);
-            Venue venue = new VenueDao().getById(venueId);
-            Map<Double, List<String>> courtPriceMap = new HashMap<>();
-            for (Court court : venue.getCourts()) {
-                double price = court.getPricePerHour();
-                String courtName = court.getName();
+            Venue venue = new VenueDao().findByIdAndDeletedFalse(venueId);
+            if (venue != null){
+                String from = req.getParameter("from");
+                String to = req.getParameter("to");
+                LocalDateTime startDateTime;
+                LocalDateTime endDateTime;
+                if (from.isEmpty() && to.isEmpty()) {
+                    LocalDate today = LocalDate.now();
+                    LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+                    startDateTime = startOfWeek.atStartOfDay();
+                    LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY);
+                    endDateTime = endOfWeek.atTime(23, 59);
+                } else {
+                    LocalDate startDate = LocalDate.parse(from);
+                    LocalDate endDate = LocalDate.parse(to);
+                    startDateTime = startDate.atStartOfDay();
+                    endDateTime = endDate.atTime(23, 59);
+                }
+                List<Booking> bookings = new BookingDao().getConfirmedBookingIn(startDateTime, endDateTime);
+                Map<Double, List<String>> courtPriceMap = new HashMap<>();
+                for (Court court : venue.getCourts()) {
+                    double price = court.getPricePerHour();
+                    String courtName = court.getName();
 
-                courtPriceMap.computeIfAbsent(price, k -> new ArrayList<>()).add(courtName);
+                    courtPriceMap.computeIfAbsent(price, k -> new ArrayList<>()).add(courtName);
+                }
+                req.setAttribute("courtPriceMap", courtPriceMap);
+                req.setAttribute("venue", venue);
+                req.setAttribute("bookings", bookings);
+                req.getRequestDispatcher("/views/public/venue-detail.jsp").forward(req, resp);
+            } else {
+                req.getSession().setAttribute("warning", "Sân không tồn tại hoặc đã bị xóa");
+                resp.sendRedirect(req.getContextPath() + "/");
             }
-            req.setAttribute("courtPriceMap", courtPriceMap);
-            req.setAttribute("venue", venue);
-            req.setAttribute("bookings", bookings);
-            req.getRequestDispatcher("/views/public/venue-detail.jsp").forward(req, resp);
         }
     }
 

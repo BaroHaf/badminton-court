@@ -70,6 +70,11 @@
                                             data-bs-target="#updateModal">
                                         Cập nhật
                                     </button>
+                                    <a href="<%=request.getContextPath()%>/court-owner/delete-product?id=<%=p.getId()%>">
+                                        <button class="btn btn-danger">
+                                            Xóa
+                                        </button>
+                                    </a>
                                 </td>
                             </tr>
                             <% } %>

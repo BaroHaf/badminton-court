@@ -42,12 +42,21 @@ public class UploadImage {
         Part filePart = req.getPart(fieldName);
         String fileName = UploadImage.getFileName(filePart);
         assert fileName != null;
+
+        // Kiểm tra kiểu MIME của file
+        String contentType = filePart.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ServletException("File tải lên không phải là hình ảnh hợp lệ.");
+        }
+
         String newFileName = UploadImage.generateUniqueFileName(fileName);
         String uploadDir = req.getServletContext().getRealPath("/") + "uploads";
         Path filePath = Paths.get(uploadDir, newFileName);
+
         try (InputStream fileContent = filePart.getInputStream()) {
             Files.copy(fileContent, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
+
         newFileName = "uploads/" + newFileName;
         return newFileName;
     }

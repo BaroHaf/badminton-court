@@ -56,8 +56,9 @@ public class ProductController {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             long id = Long.parseLong(req.getParameter("id"));
+            User owner = (User) req.getSession().getAttribute("user");
             ProductDao productDao = new ProductDao();
-            Product product = productDao.getById(id);
+            Product product = productDao.findByIdAndUserId(id, owner.getId());
             product.setDeleted(true);
             productDao.update(product);
             resp.sendRedirect(req.getContextPath() + "/court-owner/products");

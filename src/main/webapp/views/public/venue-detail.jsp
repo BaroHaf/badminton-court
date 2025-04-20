@@ -99,7 +99,7 @@
                     <div class="col-12">
                         <label for="voucherCode" class="form-label">Mã giảm giá (nếu có)</label>
                         <div class="input-group has-validation">
-                            <input type="text" name="voucherCode" class="form-control" id="voucherCode">
+                            <input onchange="inputVoucherCode()" type="text" name="voucherCode" class="form-control" id="voucherCode">
                         </div>
                     </div>
 
@@ -267,6 +267,18 @@
     }
     function chooseStartTime(input) {
         startTime = new Date(input.value);
+        if (endTime != null){
+            if (!isStartBeforeEnd(startTime, endTime)) {
+                toastr.warning("Giờ bắt đầu phải trước giờ kết thúc")
+                $("#submit_button").prop('disabled', true);
+            } else if (!isStep30Minutes(startTime, endTime)){
+                toastr.warning("Khoảng cách giữa giờ bắt đầu và kết thúc cách nhau bội số 30p")
+                $("#submit_button").prop('disabled', true);
+            } else {
+                getTempPrice();
+                $("#submit_button").removeAttr('disabled');
+            }
+        }
     }
     function chooseEndTime(input) {
         endTime = new Date(input.value);
@@ -302,6 +314,20 @@
         if (endTime == null){
             toastr.warning("Bạn chưa chọn giờ kết thúc")
             e.preventDefault()
+        }
+    }
+    function inputVoucherCode(){
+        if (startTime != null && endTime != null){
+            if (!isStartBeforeEnd(startTime, endTime)) {
+                toastr.warning("Giờ bắt đầu phải trước giờ kết thúc")
+                $("#submit_button").prop('disabled', true);
+            } else if (!isStep30Minutes(startTime, endTime)){
+                toastr.warning("Khoảng cách giữa giờ bắt đầu và kết thúc cách nhau bội số 30p")
+                $("#submit_button").prop('disabled', true);
+            } else {
+                getTempPrice();
+                $("#submit_button").removeAttr('disabled');
+            }
         }
     }
 </script>

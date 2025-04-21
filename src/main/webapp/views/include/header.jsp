@@ -9,7 +9,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
         <a href="<%=request.getContextPath()%>/" class="logo d-flex align-items-center">
-            <img src="<%=request.getContextPath()%>/assets/img/logo.png" alt="">
+            <img src="<%=request.getContextPath()%>/assets/img/apple-touch-icon.png" alt="">
             <span class="d-none d-lg-block"><%=Config.app_name%></span>
         </a>
         <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -36,7 +36,7 @@
                 <li class="nav-item dropdown pe-3" style="width: 400px;">
                     <div class="row">
                         <a class="col-6" href="<%=request.getContextPath()%>/login">
-                            <button style="width: 100%" class="btn btn-success">Đăng nhập</button>
+                            <button style="width: 100%" class="btn btn-outline-success">Đăng nhập</button>
                         </a>
                         <a class="col-6" href="<%=request.getContextPath()%>/register">
                             <button style="width: 100%" class="btn btn-outline-success">Đăng kí</button>

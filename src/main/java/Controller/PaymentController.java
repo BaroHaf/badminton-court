@@ -210,20 +210,5 @@ public class PaymentController {
         }
     }
 
-    @WebServlet("/api/calculate-price-with-voucher")
-    public static class CalculatePriceWithVoucher extends HttpServlet{
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            String voucherCode = req.getParameter("voucherCode");
-            long courtId = Long.parseLong(req.getParameter("courtId"));
-            float hours = Float.parseFloat(req.getParameter("hours"));
-            Court court = new CourtDao().getById(courtId);
-            Voucher voucher = new VoucherDao().findByCodeNotDisableAndValidTime(voucherCode);
-            long amount = (long) (hours * court.getPricePerHour());
-            if (voucher != null){
-                amount = voucher.calculateDiscount(amount);
-            }
-            resp.getWriter().print(amount);
-        }
-    }
+
 }

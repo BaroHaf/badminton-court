@@ -16,6 +16,9 @@ public class Util {
 
     public static String passwordRegex = "^(?=.*[^a-zA-Z0-9]).{8,}$";
     public static String usernameRegex = "^[a-zA-Z]+$";
+    public static String emailRegex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$";
+    public static String phoneRegex = "^0(3|5|7|8|9)[0-9]{8}$";
+
 
     public static class LocalTimeAdapter implements JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
         private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -62,5 +65,11 @@ public class Util {
     }
     public static boolean isUsernameValid(String username){
         return username.matches(usernameRegex);
+    }
+    public static boolean isEmailValid(String email) {
+        return email.matches(emailRegex);
+    }
+    public static boolean isPhoneValid(String phone) {
+        return phone.matches(phoneRegex);
     }
 }

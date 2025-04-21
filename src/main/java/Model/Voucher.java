@@ -30,7 +30,20 @@ public class Voucher extends DistributedEntity{
         if (type == VoucherType.PERCENTAGE){
             return amount * ((100 - discount) / 100);
         } else {
+            return amount - discount * 100L;
+        }
+    }
+    public long calculateDiscountdisplay(long amount) {
+        System.out.println("Amount: " + amount);
+        System.out.println("Amount percent: " + Math.round(amount * (1.0 - ((double) discount / 100.0))));
+        System.out.println("Amount tien: " + (amount - discount));
+
+        if (type == VoucherType.PERCENTAGE){
+            return Math.round(amount * (1.0 - ((double) discount / 100.0)));
+        } else {
             return amount - discount;
         }
     }
+
+
 }

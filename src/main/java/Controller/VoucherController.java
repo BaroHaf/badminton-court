@@ -1,8 +1,10 @@
 package Controller;
 
+import Dao.CourtDao;
 import Dao.VoucherDao;
 import Model.Constant.Rank;
 import Model.Constant.VoucherType;
+import Model.Court;
 import Model.Voucher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -47,7 +49,7 @@ public class VoucherController {
             String code = req.getParameter("code");
             VoucherType type = VoucherType.valueOf(req.getParameter("type"));
             int discount = Integer.parseInt(req.getParameter("discount"));
-            boolean disabled = Boolean.parseBoolean(req.getParameter("disabled"));
+            boolean disabled = "on".equals(req.getParameter("disabled"));
             LocalDate startDate = LocalDate.parse(req.getParameter("startDate"));
             LocalDate endDate = LocalDate.parse(req.getParameter("endDate"));
             Voucher voucher = new VoucherDao().getById(id);
@@ -59,6 +61,23 @@ public class VoucherController {
             voucher.setDisabled(disabled);
             new VoucherDao().update(voucher);
             resp.sendRedirect(req.getContextPath() + "/admin/voucher");
+        }
+    }
+    @WebServlet("/api/calculate-price-with-voucher")
+    public static class CalculatePriceWithVoucher extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String voucherCode = req.getParameter("voucherCode");
+            long courtId = Long.parseLong(req.getParameter("courtId"));
+            float hours = Float.parseFloat(req.getParameter("hours"));
+            Court court = new CourtDao().getById(courtId);
+            Voucher voucher = new VoucherDao().findByCodeNotDisableAndValidTime(voucherCode);
+            System.out.println(voucher);
+            long amount = (long) (hours * court.getPricePerHour());
+            if (voucher != null){
+                amount = voucher.calculateDiscountdisplay(amount);
+            }
+            resp.getWriter().print(amount);
         }
     }
 }

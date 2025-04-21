@@ -192,51 +192,78 @@ public class UserController {
             User user = (User) req.getSession().getAttribute("user");
             user = new UserDao().getById(user.getId());
             boolean check = true;
+            boolean hasChanges = false;
             if (!user.getUsername().equals(username)) {
                 if (new UserDao().findByUsername(username) != null) {
                     req.getSession().setAttribute("warning", "Username đã được sử dụng.");
                     check = false;
+                }else if(!Util.isUsernameValid(username)){
+                    req.getSession().setAttribute("warning", "Username phải dài hơn 8 kí tự và không chứa kí tự đặc biệt");
+                    check = false;
                 } else {
-                    if (!Util.isUsernameValid(username)){
-                        req.getSession().setAttribute("warning", "Username không được chứa kí tự đặc biệt.");
-                        check = false;
-                    } else {
-                        user.setUsername(username);
-                    }
+                    user.setUsername(username);
+                    hasChanges=true;
                 }
             }
             if (!user.getEmail().equals(email)) {
-                if (new UserDao().findByEmail(email) != null) {
+                if (!Util.isEmailValid(email)) {
+                    req.getSession().setAttribute("warning", "Email không đúng định dạng Gmail.");
+                    check = false;
+                } else if (new UserDao().findByEmail(email) != null) {
                     req.getSession().setAttribute("warning", "Email đã được sử dụng.");
                     check = false;
                 } else {
                     user.setEmail(email);
+                    req.getSession().setAttribute("success", "Thành công cập nhật gmail.");
+                    hasChanges = true;
                 }
             }
+
+            if ((oldPassword != null && !oldPassword.isEmpty()) || (password != null && !password.isEmpty())) {
+                if (oldPassword == null || password == null || oldPassword.isEmpty() || password.isEmpty()) {
+                    req.getSession().setAttribute("warning", "Không được để trống mật khẩu cũ hoặc mới.");
+                    check = false;
+                } else if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
+                    req.getSession().setAttribute("warning", "Mật khẩu cũ không khớp.");
+                    check = false;
+                } else if (oldPassword.equals(password)) {
+                    req.getSession().setAttribute("warning", "Password không được trùng với password cũ.");
+                    check = false;
+                } else if (!Util.isPasswordValid(password)) {
+                    req.getSession().setAttribute("warning", "Password mới phải có ít nhất 8 kí tự và một kí tự đặc biệt");
+                    check = false;
+                } else {
+                    user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+                    req.getSession().setAttribute("success", "Thành công cập nhật password.");
+                    hasChanges = true;
+                }
+            }
+
             if (!user.getPhone().equals(phone)) {
                 if (new UserDao().findByPhone(phone) != null) {
                     req.getSession().setAttribute("warning", "Số điện thoại đang được sử dụng.");
                     check = false;
+                }else if(Util.isPhoneValid(user.getPhone())){
+                    req.getSession().setAttribute("warning", "Số điện thoại không hợp lệ.");
+                    check = false;
                 } else {
                     user.setPhone(phone);
+                    hasChanges = true;
+                    req.getSession().setAttribute("success", "Thành công cập nhật số điện thoại.");
                 }
             }
-            if (!oldPassword.isEmpty()){
-                if (BCrypt.checkpw(oldPassword, user.getPassword())) {
-                    if (!password.isEmpty()) {
-                        user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-                    }
+
+            if (check) {
+                if (hasChanges) {
+                    new UserDao().update(user);
+                    req.getSession().setAttribute("user", user);
+                    req.getSession().setAttribute("success", "Cập nhật thành công.");
+                    resp.sendRedirect(req.getContextPath() + "/user/profile");
                 } else {
-                    req.getSession().setAttribute("warning", "Mật khẩu cũ không khớp.");
-                    check = false;
+                    req.getSession().setAttribute("warning", "Không có thông tin nào được thay đổi.");
+                    resp.sendRedirect(req.getContextPath() + "/user/profile");
                 }
-            }
-            if (check){
-                new UserDao().update(user);
-                req.getSession().setAttribute("user", user);
-                req.getSession().setAttribute("success", "Cập nhật thành công.");
-                resp.sendRedirect(req.getContextPath() + "/user/profile");
-            } else {
+            }else{
                 resp.sendRedirect(req.getContextPath() + "/user/profile");
             }
         }
